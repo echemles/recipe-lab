@@ -1,3 +1,8 @@
+# recipe-lab
+
+Recipe Lab is a pantry-first recipe app that adapts to your ingredients, scales portions and macros on the fly, and doubles as a smart grocery list. It helps you cook with what you have, plan what you need, and tailor every dish to your preferences and local availability.
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
