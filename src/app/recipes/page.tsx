@@ -1,13 +1,20 @@
 import Link from "next/link";
-import { Recipe } from "@/types/recipe";
-import { sampleRecipe } from "@/data/sampleRecipe";
+import { getAllRecipes } from "@/data/recipeStore";
 
 export default function RecipesPage() {
-  const recipes: Recipe[] = [sampleRecipe];
+  const recipes = getAllRecipes();
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
-      <h1 className="text-4xl font-bold mb-8">Recipes</h1>
+      <div className="w-full max-w-4xl flex items-center justify-between mb-8">
+        <h1 className="text-4xl font-bold">Recipes</h1>
+        <Link
+          href="/recipes/add"
+          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
+        >
+          + Add Recipe
+        </Link>
+      </div>
 
       {recipes.length === 0 ? (
         <p className="text-gray-500">No recipes yet.</p>

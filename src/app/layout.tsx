@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -27,7 +28,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <header className="border-b border-gray-200 bg-white/70 dark:bg-black/40 backdrop-blur">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+            <Link href="/recipes" className="text-lg font-semibold">
+              Recipe Lab
+            </Link>
+            <nav className="text-sm text-gray-600 dark:text-gray-300">
+              <Link
+                href="/recipes"
+                className="hover:text-blue-600 dark:hover:text-blue-400"
+              >
+                All recipes
+              </Link>
+            </nav>
+          </div>
+        </header>
+        <div className="mx-auto max-w-5xl px-6">{children}</div>
       </body>
     </html>
   );

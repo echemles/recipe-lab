@@ -1,5 +1,6 @@
-import { Recipe } from "@/types/recipe";
-import { sampleRecipe } from "@/data/sampleRecipe";
+import Link from "next/link";
+import { getRecipeById } from "@/data/recipeStore";
+import { TooltipIcon } from "@/components/TooltipIcon";
 
 type RecipeDetailPageProps = {
   params: {
@@ -10,9 +11,7 @@ type RecipeDetailPageProps = {
 export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   const { recipeNumber } = params;
 
-  const recipes: Recipe[] = [sampleRecipe];
-  const recipe: Recipe | null =
-    recipes.find((item) => item.id === recipeNumber) ?? null;
+  const recipe = getRecipeById(recipeNumber);
 
   if (!recipe) {
     return (
@@ -26,6 +25,14 @@ export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div className="w-full max-w-4xl">
+        <div className="mb-4 text-sm">
+          <Link
+            href="/recipes"
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+          >
+            ← Back to recipes
+          </Link>
+        </div>
         <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
         <p className="text-gray-600 mb-8">{recipe.description}</p>
 
@@ -57,14 +64,20 @@ export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
               <li
                 key={index}
                 className="flex items-start rounded-md bg-gray-50 p-3"
-                title={ingredient.tooltip ?? ingredient.note}
               >
                 <span className="font-semibold mr-3">
                   {ingredient.quantity} {ingredient.unit}
                 </span>
-                <span>
-                  {ingredient.name}
-                  {ingredient.note && <span className="text-gray-500 ml-2">({ingredient.note})</span>}
+                <span className="flex items-center gap-2">
+                  <span>
+                    {ingredient.name}
+                    {ingredient.note && (
+                      <span className="text-gray-500 ml-2">({ingredient.note})</span>
+                    )}
+                  </span>
+                  {ingredient.tooltip && (
+                    <TooltipIcon label={ingredient.tooltip} />
+                  )}
                 </span>
               </li>
             ))}

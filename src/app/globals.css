@@ -3,6 +3,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Hint browsers that both light & dark are supported */
+  color-scheme: light dark;
 }
 
 @theme inline {
@@ -16,6 +19,32 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+
+  /* Tweak commonly used gray utilities so they have good contrast on dark */
+  .bg-gray-50 {
+    /* Slightly lighter than page bg to read as a card/surface */
+    background-color: #111827;
+  }
+
+  .bg-gray-100 {
+    background-color: #1f2937;
+  }
+
+  .text-gray-500 {
+    color: #9ca3af; /* Tailwind gray-400/500-ish, readable on dark */
+  }
+
+  .text-gray-600 {
+    color: #e5e7eb; /* Lighter text for descriptions on dark */
+  }
+
+  .text-gray-700 {
+    color: #f3f4f6; /* Very light gray, close to white, for body text on dark */
+  }
+
+  .border-gray-300 {
+    border-color: #4b5563; /* Darker border for cards on dark */
   }
 }
 
