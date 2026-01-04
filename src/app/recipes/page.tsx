@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { getAllRecipes } from "@/data/recipeStore";
 
-export default function RecipesPage() {
-  const recipes = getAllRecipes();
+export const dynamic = "force-dynamic";
+
+export default async function RecipesPage() {
+  const recipes = await getAllRecipes();
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">

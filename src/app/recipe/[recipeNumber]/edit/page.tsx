@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Ingredient } from "@/types/recipe";
+import { Ingredient, Recipe } from "@/types/recipe";
 
-export default function AddRecipePage() {
+type EditRecipePageProps = {
+  params: {
+    recipeNumber: string;
+  };
+};
+
+export default function EditRecipePage({ params }: EditRecipePageProps) {
   const router = useRouter();
+  const { recipeNumber } = params;
+
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -13,16 +24,37 @@ export default function AddRecipePage() {
   const [cookTime, setCookTime] = useState("");
   const [servings, setServings] = useState("");
   const [tags, setTags] = useState("");
-
-  // Ingredients as array of partial objects
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { quantity: 0, unit: "", name: "" },
   ]);
+  const [steps, setSteps] = useState<string[]>([""]); 
 
-  // Steps as array of strings
-  const [steps, setSteps] = useState<string[]>([""]);
-
-  const [error, setError] = useState("");
+  useEffect(() => {
+    async function loadRecipe() {
+      try {
+        const response = await fetch(`/api/recipes/${recipeNumber}`);
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(body?.message ?? "Recipe not found.");
+        }
+        const existing: Recipe = await response.json();
+        setRecipe(existing);
+        setTitle(existing.title);
+        setDescription(existing.description);
+        setPrepTime(existing.prepTimeMinutes?.toString() ?? "");
+        setCookTime(existing.cookTimeMinutes?.toString() ?? "");
+        setServings(existing.servings?.toString() ?? "");
+        setTags((existing.tags ?? []).join(", "));
+        setIngredients(existing.ingredients.length ? existing.ingredients : [{ quantity: 0, unit: "", name: "" }]);
+        setSteps(existing.steps.length ? existing.steps : [""]);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load recipe.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadRecipe();
+  }, [recipeNumber]);
 
   function handleAddIngredient() {
     setIngredients([...ingredients, { quantity: 0, unit: "", name: "" }]);
@@ -60,7 +92,11 @@ export default function AddRecipePage() {
     e.preventDefault();
     setError("");
 
-    // Basic validation
+    if (!recipe) {
+      setError("Recipe not loaded.");
+      return;
+    }
+
     if (!title.trim()) {
       setError("Title is required.");
       return;
@@ -83,8 +119,8 @@ export default function AddRecipePage() {
     }
 
     try {
-      const response = await fetch("/api/recipes", {
-        method: "POST",
+      const response = await fetch(`/api/recipes/${recipe.id}`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title.trim(),
@@ -103,26 +139,41 @@ export default function AddRecipePage() {
 
       if (!response.ok) {
         const body = await response.json().catch(() => ({}));
-        throw new Error(body?.message ?? "Failed to save recipe.");
+        throw new Error(body?.message ?? "Failed to update recipe.");
       }
 
-      router.push("/recipes");
+      router.push(`/recipe/${recipe.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save recipe.");
+      setError(err instanceof Error ? err.message : "Failed to update recipe.");
     }
+  }
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-24">
+        <p className="text-gray-500">Loading recipe...</p>
+      </main>
+    );
+  }
+
+  if (error && !recipe) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center p-24">
+        <p className="text-red-600">{error}</p>
+      </main>
+    );
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div className="w-full max-w-2xl">
-        <h1 className="text-4xl font-bold mb-8">Add Recipe</h1>
+        <h1 className="text-4xl font-bold mb-8">Edit Recipe</h1>
 
         {error && (
           <p className="mb-4 rounded-md bg-red-100 p-3 text-red-800">{error}</p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="title">
               Title
@@ -136,7 +187,6 @@ export default function AddRecipePage() {
             />
           </div>
 
-          {/* Description */}
           <div>
             <label
               className="block text-sm font-medium mb-1"
@@ -153,7 +203,6 @@ export default function AddRecipePage() {
             />
           </div>
 
-          {/* Prep / Cook / Servings */}
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label
@@ -205,7 +254,6 @@ export default function AddRecipePage() {
             </div>
           </div>
 
-          {/* Tags */}
           <div>
             <label className="block text-sm font-medium mb-1" htmlFor="tags">
               Tags (comma-separated)
@@ -220,7 +268,6 @@ export default function AddRecipePage() {
             />
           </div>
 
-          {/* Ingredients */}
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium mb-1">Ingredients</legend>
             {ingredients.map((ing, idx) => (
@@ -277,7 +324,6 @@ export default function AddRecipePage() {
             </button>
           </fieldset>
 
-          {/* Steps */}
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium mb-1">Steps</legend>
             {steps.map((step, idx) => (
@@ -309,18 +355,17 @@ export default function AddRecipePage() {
             </button>
           </fieldset>
 
-          {/* Submit */}
           <div className="flex gap-4">
             <button
               type="submit"
               className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition-colors"
             >
-              Save Recipe
+              Save Changes
             </button>
             <button
               type="button"
               className="rounded-md border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors"
-              onClick={() => router.push("/recipes")}
+              onClick={() => router.push(`/recipe/${recipe?.id}`)}
             >
               Cancel
             </button>

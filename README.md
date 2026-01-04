@@ -7,7 +7,25 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- MongoDB (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
+
+### MongoDB Setup
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Update `MONGODB_URI` in `.env.local` with your MongoDB connection string:
+   - **Local MongoDB**: `mongodb://localhost:27017`
+   - **MongoDB Atlas**: `mongodb+srv://<username>:<password>@<cluster>.mongodb.net`
+
+3. Optionally set `MONGODB_DB` to customize the database name (defaults to `recipe_lab`).
+
+### Run the Development Server
 
 ```bash
 npm run dev

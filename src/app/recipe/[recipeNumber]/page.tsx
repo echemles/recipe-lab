@@ -2,16 +2,18 @@ import Link from "next/link";
 import { getRecipeById } from "@/data/recipeStore";
 import { TooltipIcon } from "@/components/TooltipIcon";
 
+export const dynamic = "force-dynamic";
+
 type RecipeDetailPageProps = {
   params: {
     recipeNumber: string;
   };
 };
 
-export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
+export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   const { recipeNumber } = params;
 
-  const recipe = getRecipeById(recipeNumber);
+  const recipe = await getRecipeById(recipeNumber);
 
   if (!recipe) {
     return (
@@ -25,12 +27,18 @@ export default function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <div className="w-full max-w-4xl">
-        <div className="mb-4 text-sm">
+        <div className="mb-4 flex items-center justify-between text-sm">
           <Link
             href="/recipes"
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             ← Back to recipes
+          </Link>
+          <Link
+            href={`/recipe/${recipe.id}/edit`}
+            className="rounded-md border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-100 transition-colors"
+          >
+            Edit recipe
           </Link>
         </div>
         <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>

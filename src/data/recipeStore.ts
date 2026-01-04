@@ -1,25 +1,78 @@
+import getClientPromise from "@/lib/mongodb";
 import { Recipe } from "@/types/recipe";
-import { sampleRecipe } from "./sampleRecipe";
+import { ObjectId, WithId } from "mongodb";
 
-// In-memory store for recipes (persists during dev session)
-const recipes: Recipe[] = [sampleRecipe];
+const DB_NAME = process.env.MONGODB_DB ?? "recipe_lab";
+const COLLECTION_NAME = "recipes";
 
-export function getAllRecipes(): Recipe[] {
-  return recipes;
+export type RecipeInput = Omit<Recipe, "id" | "createdAt" | "updatedAt">;
+
+type RecipeDocument = RecipeInput & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+async function getCollection() {
+  const client = await getClientPromise();
+  return client.db(DB_NAME).collection<RecipeDocument>(COLLECTION_NAME);
 }
 
-export function getRecipeById(id: string): Recipe | null {
-  return recipes.find((r) => r.id === id) ?? null;
+function mapDocument(doc: WithId<RecipeDocument>): Recipe {
+  const { _id, ...rest } = doc;
+  return {
+    ...rest,
+    id: _id.toHexString(),
+  };
 }
 
-export function addRecipe(recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt">): Recipe {
+function toObjectId(id: string): ObjectId | null {
+  if (!ObjectId.isValid(id)) return null;
+  return new ObjectId(id);
+}
+
+export async function getAllRecipes(): Promise<Recipe[]> {
+  const collection = await getCollection();
+  const docs = await collection.find({}).sort({ createdAt: -1 }).toArray();
+  return docs.map(mapDocument);
+}
+
+export async function getRecipeById(id: string): Promise<Recipe | null> {
+  const objectId = toObjectId(id);
+  if (!objectId) return null;
+  const collection = await getCollection();
+  const doc = await collection.findOne({ _id: objectId });
+  return doc ? mapDocument(doc) : null;
+}
+
+export async function addRecipe(recipe: RecipeInput): Promise<Recipe> {
+  const collection = await getCollection();
   const now = new Date().toISOString();
-  const newRecipe: Recipe = {
+  const document: RecipeDocument = {
     ...recipe,
-    id: String(recipes.length + 1),
     createdAt: now,
     updatedAt: now,
   };
-  recipes.push(newRecipe);
-  return newRecipe;
+  const result = await collection.insertOne(document);
+  return {
+    ...document,
+    id: result.insertedId.toHexString(),
+  };
+}
+
+export async function updateRecipe(
+  id: string,
+  updates: RecipeInput
+): Promise<Recipe | null> {
+  const objectId = toObjectId(id);
+  if (!objectId) return null;
+  const collection = await getCollection();
+  const now = new Date().toISOString();
+
+  const result = await collection.findOneAndUpdate(
+    { _id: objectId },
+    { $set: { ...updates, updatedAt: now } },
+    { returnDocument: "after" }
+  );
+
+  return result ? mapDocument(result) : null;
 }
