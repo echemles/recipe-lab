@@ -9,7 +9,7 @@ export default async function RecipesPage() {
   const recipes = await getAllRecipes();
 
   return (
-    <main className="flex min-h-screen flex-col items-center py-16">
+    <main className="recipes-listing flex min-h-screen flex-col items-center py-16">
       <div className="w-full max-w-4xl flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-2">Recipes</h1>

@@ -126,7 +126,7 @@ export default function AddRecipePage() {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-red-800 dark:text-red-200">
+          <div className="mb-6 rounded-[--radius-input] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-red-800 dark:text-red-200">
             {error}
           </div>
         )}
@@ -141,7 +141,7 @@ export default function AddRecipePage() {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="title">
+                <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="title">
                   Recipe Title *
                 </label>
                 <Input
@@ -155,7 +155,7 @@ export default function AddRecipePage() {
 
               <div>
                 <label
-                  className="block text-sm font-medium mb-1"
+                  className="block text-sm font-medium mb-1 tracking-[0.005em]"
                   htmlFor="description"
                 >
                   Description *
@@ -183,7 +183,7 @@ export default function AddRecipePage() {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label
-                    className="block text-sm font-medium mb-1"
+                    className="block text-sm font-medium mb-1 tracking-[0.005em]"
                     htmlFor="prepTime"
                   >
                     Prep Time
@@ -199,7 +199,7 @@ export default function AddRecipePage() {
                 </div>
                 <div>
                   <label
-                    className="block text-sm font-medium mb-1"
+                    className="block text-sm font-medium mb-1 tracking-[0.005em]"
                     htmlFor="cookTime"
                   >
                     Cook Time
@@ -215,7 +215,7 @@ export default function AddRecipePage() {
                 </div>
                 <div>
                   <label
-                    className="block text-sm font-medium mb-1"
+                    className="block text-sm font-medium mb-1 tracking-[0.005em]"
                     htmlFor="servings"
                   >
                     Servings
@@ -232,7 +232,7 @@ export default function AddRecipePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" htmlFor="tags">
+                <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="tags">
                   Tags
                 </label>
                 <p className="text-xs text-muted mb-1">Help others discover your recipe</p>

@@ -117,12 +117,12 @@ export default function AiAddRecipePage() {
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-red-800 dark:text-red-200">
+          <div className="rounded-[--radius-input] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-red-800 dark:text-red-200">
             {error}
           </div>
         )}
         {successMessage && (
-          <div className="rounded-lg bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-3 text-green-800 dark:text-green-200">
+          <div className="rounded-[--radius-input] bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-4 text-green-800 dark:text-green-200">
             {successMessage}{" "}
             {createdRecipe && (
               <Link
@@ -138,12 +138,12 @@ export default function AiAddRecipePage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card className="p-6 space-y-6">
             <div>
-              <h2 className="text-lg font-semibold mb-1">What would you like to make?</h2>
+              <h2 className="text-lg font-semibold mb-1 letter-spac">What would you like to make?</h2>
               <p className="text-sm text-muted mb-4">Give the AI a starting point for your recipe</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="title">
+              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="title">
                 Recipe Name (Optional)
               </label>
               <Input
@@ -156,7 +156,7 @@ export default function AiAddRecipePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="description">
+              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="description">
                 Recipe Description *
               </label>
               <p className="text-xs text-muted mb-1">
@@ -174,12 +174,12 @@ export default function AiAddRecipePage() {
 
           <Card className="p-6 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold mb-1">Ingredients You Have</h2>
+              <h2 className="text-lg font-semibold tracking-[0.1rem] mb-1">Ingredients You Have</h2>
               <p className="text-sm text-muted">Tell the AI what's in your pantry (optional)</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" htmlFor="pantryInput">
+              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="pantryInput">
                 Add Pantry Items
               </label>
               <div className="flex gap-2">
@@ -207,7 +207,7 @@ export default function AiAddRecipePage() {
                 {pantryItems.map((item) => (
                   <span
                     key={item}
-                    className="inline-flex items-center gap-2 rounded-full bg-accent/10 border border-accent/20 px-3 py-1 text-sm"
+                    className="inline-flex items-center gap-2 rounded-[--radius-input] bg-accent/10 border border-accent/20 px-3 py-1 text-sm"
                   >
                     {item}
                     <button
@@ -228,12 +228,12 @@ export default function AiAddRecipePage() {
 
           <Card className="p-6 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold mb-1">Flavor & Preferences</h2>
+              <h2 className="text-lg font-semibold tracking-[0.1rem] mb-1">Flavor & Preferences</h2>
               <p className="text-sm text-muted">Customize the recipe to your taste</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium mb-2 tracking-[0.005em]">
                 Flavor Complexity: <span className="font-semibold text-accent">{palateLevel <= 3 ? 'Mild & Familiar' : palateLevel <= 7 ? 'Moderate' : 'Bold & Adventurous'}</span>
               </label>
               <p className="text-xs text-muted mb-3">
@@ -247,7 +247,7 @@ export default function AiAddRecipePage() {
                 max="10"
                 value={palateLevel}
                 onChange={(e) => setPalateLevel(Number(e.target.value))}
-                className="w-full h-2 bg-surface-2 rounded-lg appearance-none cursor-pointer accent-accent"
+                className="w-full h-2 bg-surface-2 rounded-[--radius-input] appearance-none cursor-pointer accent-accent"
               />
               <div className="flex justify-between text-xs text-muted mt-1">
                 <span>Mild</span>
@@ -257,11 +257,11 @@ export default function AiAddRecipePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-3">
+              <label className="block text-sm font-medium mb-3 tracking-[0.005em]">
                 Dietary Requirements (Optional)
               </label>
               <div className="grid grid-cols-2 gap-3">
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-lg transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
                     checked={highProtein}
@@ -270,7 +270,7 @@ export default function AiAddRecipePage() {
                   />
                   <span className="text-sm">High Protein</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-lg transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
                     checked={lowCarb}
@@ -279,7 +279,7 @@ export default function AiAddRecipePage() {
                   />
                   <span className="text-sm">Low-Carb</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-lg transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
                     checked={glutenFree}
@@ -288,7 +288,7 @@ export default function AiAddRecipePage() {
                   />
                   <span className="text-sm">Gluten-Free</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-lg transition-colors">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
                     checked={budgetFriendly}
@@ -297,7 +297,7 @@ export default function AiAddRecipePage() {
                   />
                   <span className="text-sm">Budget-Friendly</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-lg transition-colors col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors col-span-2">
                   <input
                     type="checkbox"
                     checked={localIngredients}
@@ -375,24 +375,24 @@ export default function AiAddRecipePage() {
             </div>
             <div className="flex flex-wrap gap-3 text-sm text-muted">
               {createdRecipe.prepTimeMinutes && (
-                <span className="rounded-full bg-surface-2 px-3 py-1">
+                <span className="rounded-[--radius-input] bg-surface-2 px-3 py-1">
                   Prep: {createdRecipe.prepTimeMinutes} min
                 </span>
               )}
               {createdRecipe.cookTimeMinutes && (
-                <span className="rounded-full bg-surface-2 px-3 py-1">
+                <span className="rounded-[--radius-input] bg-surface-2 px-3 py-1">
                   Cook: {createdRecipe.cookTimeMinutes} min
                 </span>
               )}
               {createdRecipe.servings && (
-                <span className="rounded-full bg-surface-2 px-3 py-1">
+                <span className="rounded-[--radius-input] bg-surface-2 px-3 py-1">
                   Serves {createdRecipe.servings}
                 </span>
               )}
               {(createdRecipe.tags ?? []).map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-accent/10 text-accent px-3 py-1"
+                  className="rounded-[--radius-input] bg-accent/10 text-accent px-3 py-1"
                 >
                   {tag}
                 </span>

@@ -76,3 +76,12 @@ export async function updateRecipe(
 
   return result ? mapDocument(result) : null;
 }
+
+export async function deleteRecipe(id: string): Promise<boolean> {
+  const objectId = toObjectId(id);
+  if (!objectId) return false;
+  const collection = await getCollection();
+  
+  const result = await collection.deleteOne({ _id: objectId });
+  return result.deletedCount > 0;
+}

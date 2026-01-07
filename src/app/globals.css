@@ -18,13 +18,23 @@
   --accent: 142 76% 36%;
   --accent-foreground: 0 0% 100%;
   
-  /* Shape */
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  /* Shape - Normalized Border Radius */
+  --radius-input: 0.625rem;   /* 10px - inputs/chips */
+  --radius-button: 0.875rem;  /* 14px - buttons */
+  --radius-card: 1.125rem;    /* 18px - cards */
+  --radius-panel: 1.625rem;   /* 26px - modals/panels */
   
-  /* Depth */
-  --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.06);
-  --shadow-2: 0 4px 12px 0 rgb(0 0 0 / 0.08);
+  /* Legacy aliases */
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-panel);
+  
+  /* Depth - Reduced Shadow Emphasis */
+  --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-2: 0 2px 8px 0 rgb(0 0 0 / 0.06);
+  
+  /* Background Gradients */
+  --bg-ai-light: linear-gradient(160deg, hsl(220 20% 98%) 0%, hsl(258 40% 97%) 45%, hsl(220 18% 96%) 100%);
+  --bg-ai-dark: linear-gradient(160deg, hsl(230 15% 7%) 0%, hsl(258 35% 14%) 45%, hsl(230 15% 11%) 100%);
 
   color-scheme: light;
 }
@@ -43,8 +53,8 @@
   --accent: 142 76% 36%;
   --accent-foreground: 0 0% 100%;
   
-  --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.3);
-  --shadow-2: 0 4px 12px 0 rgb(0 0 0 / 0.5);
+  --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.15);
+  --shadow-2: 0 2px 8px 0 rgb(0 0 0 / 0.25);
 }
 
 /* Map tokens to Tailwind v4 theme */
@@ -58,23 +68,134 @@
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
   
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
   
+  --radius-input: var(--radius-input);
+  --radius-button: var(--radius-button);
+  --radius-card: var(--radius-card);
+  --radius-panel: var(--radius-panel);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
   
   --shadow-soft: var(--shadow-1);
   --shadow-deep: var(--shadow-2);
+  
+  --bg-ai-light: var(--bg-ai-light);
+  --bg-ai-dark: var(--bg-ai-dark);
 }
 
-/* Base styles */
+/* Typography System */
 body {
-  background: hsl(var(--bg));
+  font-family: var(--font-sans);
+  font-weight: 440;
+  line-height: 1.65;
+  letter-spacing: 0.005em;
+  background: var(--bg-ai-light);
   color: hsl(var(--text));
   transition-property: background-color, border-color, color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "ss02";
+  font-variation-settings: "opsz" 32, "slnt" 0, "GRAD" 0, "wght" 440;
+}
+
+.dark body {
+  background: var(--bg-ai-dark);
+}
+
+.test-tube-icon {
+  filter: invert(0);
+}
+
+.dark .test-tube-icon {
+  filter: invert(1);
+}
+
+/* Page-specific overrides */
+main.recipes-listing h2 {
+  letter-spacing: 0;
+}
+
+/* Ingredient alignment */
+.ingredient-list {
+  display: grid;
+  grid-template-columns: 80px 80px 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.ingredient-list .quantity {
+  text-align: right;
+  font-weight: 600;
+}
+
+.ingredient-list .unit {
+  font-weight: 600;
+}
+
+.ingredient-list .name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Modern Heading Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 560;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  font-feature-settings: "ss01", "ss02";
+  font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "wght" 560;
+}
+
+h1 { 
+  font-weight: 620;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  font-variation-settings: "opsz" 64, "slnt" 0, "GRAD" 0, "wght" 620;
+}
+h2 { 
+  font-weight: 580;
+  letter-spacing: 0.1rem;
+  font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "wght" 580;
+}
+h3 { 
+  font-weight: 570;
+  letter-spacing: 0.1rem;
+  font-variation-settings: "opsz" 32, "slnt" 0, "GRAD" 0, "wght" 570;
+}
+
+/* UI Element Typography */
+button, [role="button"], label, .label {
+  letter-spacing: 0.015em;
+  font-weight: 480;
+  font-feature-settings: "ss03";
+  font-variation-settings: "opsz" 16, "slnt" 0, "GRAD" 0, "wght" 480;
+}
+
+/* Input Typography */
+input, textarea, select {
+  font-weight: 440;
+  letter-spacing: 0.005em;
+  font-variation-settings: "opsz" 16, "slnt" 0, "GRAD" 0, "wght" 440;
+}
+
+/* Small Text Typography */
+small, .text-sm, .text-xs {
+  font-weight: 420;
+  letter-spacing: 0.005em;
+  line-height: 1.5;
+  font-variation-settings: "opsz" 12, "slnt" 0, "GRAD" 0, "wght" 420;
+}
+
+/* Code Typography */
+code, pre {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  letter-spacing: 0.02em;
 }
 
 @media (prefers-reduced-motion: reduce) {

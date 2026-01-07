@@ -14,7 +14,7 @@ export function ThemeToggle() {
   if (!mounted) {
     return (
       <button
-        className="text-sm text-muted hover:text-text transition-colors px-3 py-1.5 rounded-lg"
+        className="text-sm text-muted hover:text-text transition-colors px-3 py-1.5 rounded-[--radius-button] tracking-[0.015em]"
         aria-label="Toggle theme"
       >
         Theme
@@ -25,7 +25,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="text-sm text-muted hover:text-text transition-colors px-3 py-1.5 rounded-lg hover:bg-surface-2"
+      className="text-sm text-muted hover:text-text transition-colors px-3 py-1.5 rounded-[--radius-button] hover:bg-surface-2 tracking-[0.015em]"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? "Light" : "Dark"}

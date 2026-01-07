@@ -1,4 +1,5 @@
 import Link from "next/link";
+import React from "react";
 import { getRecipeById } from "@/data/recipeStore";
 import { TooltipIcon } from "@/components/TooltipIcon";
 import { Button } from "@/components/ui/Button";
@@ -65,29 +66,35 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
 
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
-          <ul className="space-y-2">
+          <div className="ingredient-list">
             {recipe.ingredients.map((ingredient, index) => (
-              <li
-                key={index}
-                className="flex items-start rounded-lg bg-surface-2 p-3"
-              >
-                <span className="font-semibold mr-3">
-                  {ingredient.quantity} {ingredient.unit}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span>
-                    {ingredient.name}
-                    {ingredient.note && (
-                      <span className="text-muted ml-2">({ingredient.note})</span>
+              <React.Fragment key={index}>
+                <div className="rounded-[--radius-input] bg-surface-2 p-3">
+                  <span className="quantity">
+                    {ingredient.quantity}
+                  </span>
+                </div>
+                <div className="rounded-[--radius-input] bg-surface-2 p-3">
+                  <span className="unit">
+                    {ingredient.unit}
+                  </span>
+                </div>
+                <div className="rounded-[--radius-input] bg-surface-2 p-3">
+                  <span className="name">
+                    <span>
+                      {ingredient.name}
+                      {ingredient.note && (
+                        <span className="text-muted ml-2">({ingredient.note})</span>
+                      )}
+                    </span>
+                    {ingredient.tooltip && (
+                      <TooltipIcon label={ingredient.tooltip} />
                     )}
                   </span>
-                  {ingredient.tooltip && (
-                    <TooltipIcon label={ingredient.tooltip} />
-                  )}
-                </span>
-              </li>
+                </div>
+              </React.Fragment>
             ))}
-          </ul>
+          </div>
         </div>
 
         <div className="mb-8">
@@ -106,7 +113,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
               {recipe.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="rounded-full bg-accent/10 text-accent px-3 py-1 text-sm"
+                  className="rounded-[--radius-input] bg-accent/10 text-accent px-3 py-1 text-sm"
                 >
                   {tag}
                 </span>

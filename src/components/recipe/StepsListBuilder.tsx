@@ -22,7 +22,7 @@ export function StepsListBuilder({
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
         <div>
-          <h3 className="text-sm font-medium">Instructions</h3>
+          <h3 className="text-base font-semibold tracking-[0.1rem]">Instructions</h3>
           <p className="text-xs text-muted mt-0.5">
             Break down the recipe into clear, sequential steps
           </p>
@@ -38,7 +38,7 @@ export function StepsListBuilder({
       </div>
 
       {steps.length === 0 ? (
-        <div className="rounded-lg border-2 border-dashed border-border bg-surface-2 p-6 text-center">
+        <div className="rounded-[--radius-card] border-2 border-dashed border-border bg-surface-2 p-6 text-center">
           <p className="text-sm text-muted mb-3">No steps added yet</p>
           <Button
             type="button"

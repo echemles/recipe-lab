@@ -22,6 +22,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -153,6 +154,33 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
     }
   }
 
+  const handleDelete = async () => {
+    if (!recipe) return;
+    
+    if (!confirm("Are you sure you want to delete this recipe? This action cannot be undone.")) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/recipes/${recipe.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body?.message ?? "Failed to delete recipe.");
+      }
+
+      router.push("/recipes");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete recipe.");
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <main className="flex min-h-screen flex-col items-center py-16">
@@ -179,7 +207,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
         </div>
 
         {error && (
-          <div className="mb-6 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-3 text-red-800 dark:text-red-200">
+          <div className="mb-6 rounded-[--radius-input] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 p-4 text-red-800 dark:text-red-200">
             {error}
           </div>
         )}
@@ -331,6 +359,15 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
               onClick={() => router.push(`/recipe/${recipe?.id ?? recipeNumber}`)}
             >
               Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
           </div>
         </form>

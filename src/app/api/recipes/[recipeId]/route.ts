@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getRecipeById, updateRecipe, RecipeInput } from "@/data/recipeStore";
+import { getRecipeById, updateRecipe, deleteRecipe, RecipeInput } from "@/data/recipeStore";
 
 type RouteContext = {
   params: Promise<{
@@ -48,4 +48,19 @@ export async function PUT(request: Request, { params }: RouteContext) {
 
   const updated = await updateRecipe(existing.id, payload);
   return NextResponse.json(updated);
+}
+
+export async function DELETE(_request: Request, { params }: RouteContext) {
+  const { recipeId } = await params;
+  const existing = await getRecipeById(recipeId);
+  if (!existing) {
+    return NextResponse.json({ message: "Recipe not found." }, { status: 404 });
+  }
+
+  const deleted = await deleteRecipe(existing.id);
+  if (!deleted) {
+    return NextResponse.json({ message: "Failed to delete recipe." }, { status: 500 });
+  }
+
+  return NextResponse.json({ message: "Recipe deleted successfully." });
 }
