@@ -1,55 +1,88 @@
 @import "tailwindcss";
 
+/* Design Tokens - Light Theme (default) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --bg: 220 13% 97%;
+  --surface-1: 0 0% 100%;
+  --surface-2: 220 13% 95%;
+  
+  /* Text */
+  --text: 222 47% 11%;
+  --muted: 215 16% 47%;
+  
+  /* UI */
+  --border: 220 13% 87%;
+  
+  /* Brand */
+  --accent: 142 76% 36%;
+  --accent-foreground: 0 0% 100%;
+  
+  /* Shape */
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Depth */
+  --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  --shadow-2: 0 4px 12px 0 rgb(0 0 0 / 0.08);
 
-  /* Hint browsers that both light & dark are supported */
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
+/* Dark Theme */
+.dark {
+  --bg: 222 47% 7%;
+  --surface-1: 217 33% 10%;
+  --surface-2: 215 28% 13%;
+  
+  --text: 210 40% 96%;
+  --muted: 217 10% 65%;
+  
+  --border: 217 33% 17%;
+  
+  --accent: 142 76% 36%;
+  --accent-foreground: 0 0% 100%;
+  
+  --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.3);
+  --shadow-2: 0 4px 12px 0 rgb(0 0 0 / 0.5);
+}
+
+/* Map tokens to Tailwind v4 theme */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: hsl(var(--bg));
+  --color-surface-1: hsl(var(--surface-1));
+  --color-surface-2: hsl(var(--surface-2));
+  --color-text: hsl(var(--text));
+  --color-muted: hsl(var(--muted));
+  --color-border: hsl(var(--border));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  
+  --shadow-soft: var(--shadow-1);
+  --shadow-deep: var(--shadow-2);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-
-  /* Tweak commonly used gray utilities so they have good contrast on dark */
-  .bg-gray-50 {
-    /* Slightly lighter than page bg to read as a card/surface */
-    background-color: #111827;
-  }
-
-  .bg-gray-100 {
-    background-color: #1f2937;
-  }
-
-  .text-gray-500 {
-    color: #9ca3af; /* Tailwind gray-400/500-ish, readable on dark */
-  }
-
-  .text-gray-600 {
-    color: #e5e7eb; /* Lighter text for descriptions on dark */
-  }
-
-  .text-gray-700 {
-    color: #f3f4f6; /* Very light gray, close to white, for body text on dark */
-  }
-
-  .border-gray-300 {
-    border-color: #4b5563; /* Darker border for cards on dark */
-  }
-}
-
+/* Base styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: hsl(var(--bg));
+  color: hsl(var(--text));
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
