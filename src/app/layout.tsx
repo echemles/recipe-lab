@@ -58,7 +58,7 @@ export default function RootLayout({
               </nav>
             </div>
           </header>
-          <div className="mx-auto max-w-5xl px-6">{children}</div>
+          <div className="mx-auto max-w-5xl px-6" data-testid="app-shell">{children}</div>
         </ThemeProvider>
       </body>
     </html>

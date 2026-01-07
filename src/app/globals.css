@@ -67,20 +67,20 @@
   --color-border: hsl(var(--border));
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
-  
+
   --font-sans: var(--font-inter);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  
+
   --radius-input: var(--radius-input);
   --radius-button: var(--radius-button);
   --radius-card: var(--radius-card);
   --radius-panel: var(--radius-panel);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
-  
+
   --shadow-soft: var(--shadow-1);
   --shadow-deep: var(--shadow-2);
-  
+
   --bg-ai-light: var(--bg-ai-light);
   --bg-ai-dark: var(--bg-ai-dark);
 }

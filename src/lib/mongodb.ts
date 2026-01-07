@@ -13,7 +13,14 @@ function getClientPromise(): Promise<MongoClient> {
     return clientPromise;
   }
 
-  const uri = process.env.MONGODB_URI;
+  const isTestEnvironment =
+    process.env.NODE_ENV === "test" || process.env.PLAYWRIGHT_TEST === "true";
+
+  // Use test database only when running Playwright or in test environment
+  const uri = isTestEnvironment
+    ? (process.env.MONGODB_URI_TEST || process.env.MONGODB_URI)
+    : process.env.MONGODB_URI;
+  
   if (!uri) {
     throw new Error("MONGODB_URI environment variable is missing.");
   }

@@ -8,13 +8,13 @@ import { Card } from "@/components/ui/Card";
 export const dynamic = "force-dynamic";
 
 type RecipeDetailPageProps = {
-  params: {
+  params: Promise<{
     recipeNumber: string;
-  };
+  }>;
 };
 
 export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
-  const { recipeNumber } = params;
+  const { recipeNumber } = await params;
 
   const recipe = await getRecipeById(recipeNumber);
 
@@ -34,7 +34,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           <Link href="/recipes">
             <Button variant="ghost" size="sm">← Back to recipes</Button>
           </Link>
-          <Link href={`/recipe/${recipe.id}/edit`}>
+          <Link href={`/recipe/${recipe.id}/edit`} data-testid="edit-recipe-link">
             <Button variant="secondary" size="sm">Edit recipe</Button>
           </Link>
         </div>

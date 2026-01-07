@@ -131,7 +131,7 @@ export default function AddRecipePage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" data-testid="recipe-form">
           {/* Basic Information Section */}
           <Card className="p-6">
             <div className="mb-5">
@@ -150,6 +150,7 @@ export default function AddRecipePage() {
                   placeholder="e.g. Grandma's Chocolate Chip Cookies"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  data-testid="title-input"
                 />
               </div>
 
@@ -269,7 +270,7 @@ export default function AddRecipePage() {
 
           {/* Submit Actions */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" variant="primary" className="flex-1 sm:flex-initial">
+            <Button type="submit" variant="primary" className="flex-1 sm:flex-initial" data-testid="save-button">
               Save Recipe
             </Button>
             <Button

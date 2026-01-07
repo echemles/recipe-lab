@@ -19,7 +19,7 @@ export default async function RecipesPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link href="/recipes/add">
-            <Button variant="secondary">+ Add Recipe</Button>
+            <Button variant="secondary" data-testid="create-recipe-button">+ Add Recipe</Button>
           </Link>
           <Link href="/recipes/ai-add">
             <Button variant="primary">✨ AI Add Recipe</Button>
@@ -30,11 +30,20 @@ export default async function RecipesPage() {
       {recipes.length === 0 ? (
         <p className="text-muted">No recipes yet.</p>
       ) : (
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl" data-testid="recipes-list">
           <div className="grid gap-4">
             {recipes.map((recipe) => (
-              <Link key={recipe.id} href={`/recipe/${recipe.id}`}>
-                <Card className="hover:shadow-deep transition-shadow cursor-pointer">
+              <Link
+                key={recipe.id}
+                href={`/recipe/${recipe.id}`}
+                data-testid="recipe-link"
+                data-recipe-title={recipe.title}
+              >
+                <Card
+                  className="hover:shadow-deep transition-shadow cursor-pointer"
+                  data-testid="recipe-card"
+                  data-recipe-title={recipe.title}
+                >
                   <h2 className="text-2xl font-semibold mb-2">{recipe.title}</h2>
                   <p className="text-muted">{recipe.description}</p>
                 </Card>

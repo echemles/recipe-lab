@@ -2,7 +2,14 @@ import getClientPromise from "@/lib/mongodb";
 import { Recipe } from "@/types/recipe";
 import { ObjectId, WithId } from "mongodb";
 
-const DB_NAME = process.env.MONGODB_DB ?? "recipe_lab";
+const isTestDatabase =
+  process.env.NODE_ENV === "test" || process.env.PLAYWRIGHT_TEST === "true";
+
+const DEFAULT_DB = process.env.MONGODB_DB ?? "recipe_lab";
+
+const DB_NAME = isTestDatabase
+  ? process.env.MONGODB_DB_TEST || `${DEFAULT_DB}_test`
+  : DEFAULT_DB;
 const COLLECTION_NAME = "recipes";
 
 export type RecipeInput = Omit<Recipe, "id" | "createdAt" | "updatedAt">;
@@ -32,6 +39,10 @@ function toObjectId(id: string): ObjectId | null {
 
 export async function getAllRecipes(): Promise<Recipe[]> {
   const collection = await getCollection();
+  if (process.env.PLAYWRIGHT_TEST === "true") {
+    const count = await collection.countDocuments();
+    console.log(`[playwright-test] Recipes found: ${count}`);
+  }
   const docs = await collection.find({}).sort({ createdAt: -1 }).toArray();
   return docs.map(mapDocument);
 }

@@ -212,7 +212,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6" data-testid="recipe-form">
           {/* Basic Information Section */}
           <Card className="p-6">
             <div className="mb-5">
@@ -231,6 +231,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
                   placeholder="e.g. Grandma's Chocolate Chip Cookies"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  data-testid="title-input"
                 />
               </div>
 
@@ -350,7 +351,12 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
 
           {/* Submit Actions */}
           <div className="flex gap-3 pt-2">
-            <Button type="submit" variant="primary" className="flex-1 sm:flex-initial">
+            <Button
+              type="submit"
+              variant="primary"
+              className="flex-1 sm:flex-initial"
+              data-testid="save-button"
+            >
               Save Changes
             </Button>
             <Button
@@ -366,6 +372,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
               onClick={handleDelete}
               disabled={isDeleting}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+              data-testid="delete-button"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
