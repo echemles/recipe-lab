@@ -9,8 +9,11 @@ type AutoAddRequest = {
   palateLevel?: number;
   preferences?: {
     highProtein?: boolean;
+    quickMeal?: boolean;
+    lowCalorie?: boolean;
+    mealPrepFriendly?: boolean;
+    lowCost?: boolean;
     budgetFriendly?: boolean;
-    localIngredients?: boolean;
     lowCarb?: boolean;
     glutenFree?: boolean;
   };

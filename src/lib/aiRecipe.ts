@@ -10,8 +10,11 @@ export type AIRecipeDraftInput = {
   palateLevel?: number;
   preferences?: {
     highProtein?: boolean;
+    quickMeal?: boolean;
+    lowCalorie?: boolean;
+    mealPrepFriendly?: boolean;
+    lowCost?: boolean;
     budgetFriendly?: boolean;
-    localIngredients?: boolean;
     lowCarb?: boolean;
     glutenFree?: boolean;
   };
@@ -123,8 +126,11 @@ function buildUserPrompt(
 
   const dietaryNeeds: string[] = [];
   if (preferences.highProtein) dietaryNeeds.push("high protein");
+  if (preferences.quickMeal) dietaryNeeds.push("ready in 30 minutes or less");
+  if (preferences.lowCalorie) dietaryNeeds.push("low-calorie");
+  if (preferences.mealPrepFriendly) dietaryNeeds.push("meal-prep friendly");
+  if (preferences.lowCost) dietaryNeeds.push("low cost");
   if (preferences.budgetFriendly) dietaryNeeds.push("budget-friendly");
-  if (preferences.localIngredients) dietaryNeeds.push("locally appropriate ingredients");
   if (preferences.lowCarb) dietaryNeeds.push("low-carb");
   if (preferences.glutenFree) dietaryNeeds.push("gluten-free");
 

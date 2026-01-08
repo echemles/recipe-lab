@@ -18,8 +18,11 @@ export default function AiAddRecipePage() {
   const [pantryItems, setPantryItems] = useState<string[]>([]);
   const [palateLevel, setPalateLevel] = useState(5);
   const [highProtein, setHighProtein] = useState(false);
+  const [quickMeal, setQuickMeal] = useState(false);
+  const [lowCalorie, setLowCalorie] = useState(false);
+  const [mealPrepFriendly, setMealPrepFriendly] = useState(false);
+  const [lowCost, setLowCost] = useState(false);
   const [budgetFriendly, setBudgetFriendly] = useState(false);
-  const [localIngredients, setLocalIngredients] = useState(false);
   const [lowCarb, setLowCarb] = useState(false);
   const [glutenFree, setGlutenFree] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -69,8 +72,11 @@ export default function AiAddRecipePage() {
           palateLevel,
           preferences: {
             highProtein,
+            quickMeal,
+            lowCalorie,
+            mealPrepFriendly,
+            lowCost,
             budgetFriendly,
-            localIngredients,
             lowCarb,
             glutenFree,
           },
@@ -92,8 +98,11 @@ export default function AiAddRecipePage() {
       setPantryItems([]);
       setPalateLevel(5);
       setHighProtein(false);
+      setQuickMeal(false);
+      setLowCalorie(false);
+      setMealPrepFriendly(false);
+      setLowCost(false);
       setBudgetFriendly(false);
-      setLocalIngredients(false);
       setLowCarb(false);
       setGlutenFree(false);
     } catch (err) {
@@ -273,6 +282,15 @@ export default function AiAddRecipePage() {
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
+                    checked={quickMeal}
+                    onChange={(e) => setQuickMeal(e.target.checked)}
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm">Quick Meal (≤30 min)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
                     checked={lowCarb}
                     onChange={(e) => setLowCarb(e.target.checked)}
                     className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
@@ -291,20 +309,38 @@ export default function AiAddRecipePage() {
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
+                    checked={lowCalorie}
+                    onChange={(e) => setLowCalorie(e.target.checked)}
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm">Low Calorie</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={mealPrepFriendly}
+                    onChange={(e) => setMealPrepFriendly(e.target.checked)}
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                  />
+                  <span className="text-sm">Meal-Prep Friendly</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
                     checked={budgetFriendly}
                     onChange={(e) => setBudgetFriendly(e.target.checked)}
                     className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
                   />
                   <span className="text-sm">Budget-Friendly</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors col-span-2">
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
-                    checked={localIngredients}
-                    onChange={(e) => setLocalIngredients(e.target.checked)}
+                    checked={lowCost}
+                    onChange={(e) => setLowCost(e.target.checked)}
                     className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
                   />
-                  <span className="text-sm">Use Locally Available Ingredients</span>
+                  <span className="text-sm">Low Cost</span>
                 </label>
               </div>
             </div>

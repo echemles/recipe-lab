@@ -69,24 +69,11 @@ function parseArgs() {
 }
 
 /**
- * Generate 2 varied queries per recipe for hero/ingredient diversity.
+ * Generate 1 query per recipe and get first 2 images from results.
  */
-function generateQueries(recipe) {
-  const queries = [];
-  
-  // Query 1: Hero shot - main dish/title
-  queries.push(recipe.title.replace(/\s*\(.*?\)\s*/g, '').trim());
-  
-  // Query 2: Main ingredient (if available)
-  if (recipe.ingredients && recipe.ingredients.length > 0) {
-    const mainIngredient = recipe.ingredients[0].name;
-    queries.push(mainIngredient);
-  } else {
-    // Fallback to generic food query
-    queries.push('delicious food');
-  }
-  
-  return queries.slice(0, 2);
+function generateQuery(recipe) {
+  // Use recipe title as primary query
+  return recipe.title.replace(/\s*\(.*?\)\s*/g, '').trim();
 }
 
 /**
@@ -291,38 +278,34 @@ async function main() {
         continue;
       }
 
-      const queries = generateQueries(recipe);
+      const query = generateQuery(recipe);
       const images = [];
-      const usedIds = new Set();
-
-      for (const query of queries) {
-        console.log(`  🔍 Query: "${query}"`);
+      
+      console.log(`  🔍 Query: "${query}"`);
+      
+      try {
+        const response = await retryWithBackoff(() =>
+          searchPhotos({ query, page: 1, perPage: opts.perPage })
+        );
         
-        try {
-          const response = await retryWithBackoff(() =>
-            searchPhotos({ query, page: 1, perPage: opts.perPage })
-          );
-          
-          const top = response.results.find((photo) => !usedIds.has(photo.id));
-          if (!top) {
-            console.log('  ⚠️  No unique result; skipping this query');
-            await sleep(250 + Math.random() * 250);
-            continue;
-          }
-          
-          usedIds.add(top.id);
-          const img = toRecipeImage(top, opts.utmSource);
+        // Take first 2 unique images from the results
+        const uniquePhotos = response.results.filter((photo, index, self) => 
+          index === self.findIndex(p => p.id === photo.id)
+        ).slice(0, 2);
+        
+        for (const photo of uniquePhotos) {
+          const img = toRecipeImage(photo, opts.utmSource);
           images.push(img);
-          console.log(`  ✅ Selected: ${top.id} – ${top.alt_description ?? '(no alt)'}`);
+          console.log(`  ✅ Selected: ${photo.id} – ${photo.alt_description ?? '(no alt)'}`);
           
           // Fire-and-forget download tracking
-          void triggerDownload(top.links.download_location);
-          
-          // Rate limit: 250-500ms
-          await sleep(250 + Math.random() * 250);
-        } catch (err) {
-          console.error(`  ❌ Error searching for "${query}":`, err);
+          void triggerDownload(photo.links.download_location);
         }
+        
+        // Rate limit: 250-500ms per recipe
+        await sleep(250 + Math.random() * 250);
+      } catch (err) {
+        console.error(`  ❌ Error searching for "${query}":`, err);
       }
 
       if (!opts.dryRun && images.length > 0) {
