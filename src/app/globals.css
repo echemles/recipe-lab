@@ -106,11 +106,13 @@ body {
   background: var(--bg-ai-dark);
 }
 
-.test-tube-icon {
+.test-tube-icon,
+.recipe-tag-icon {
   filter: invert(0);
 }
 
-.dark .test-tube-icon {
+.dark .test-tube-icon,
+.dark .recipe-tag-icon {
   filter: invert(1);
 }
 

@@ -16,6 +16,52 @@
   },
   "required": ["recipes"],
   "definitions": {
+    "recipeImage": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["unsplash"]
+        },
+        "photoId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "urlSmall": {
+          "type": "string",
+          "format": "uri"
+        },
+        "urlRegular": {
+          "type": "string",
+          "format": "uri"
+        },
+        "urlFull": {
+          "type": "string",
+          "format": "uri"
+        },
+        "alt": {
+          "type": "string"
+        },
+        "creditName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "creditUsername": {
+          "type": "string",
+          "minLength": 1
+        },
+        "creditUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["provider", "photoId", "urlSmall", "urlRegular", "urlFull", "alt", "creditName", "creditUsername", "creditUrl", "sourceUrl"]
+    },
     "ingredient": {
       "type": "object",
       "additionalProperties": false,
@@ -102,6 +148,13 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "images": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/definitions/recipeImage"
+          }
         }
       },
       "required": ["title", "description", "ingredients", "steps"],

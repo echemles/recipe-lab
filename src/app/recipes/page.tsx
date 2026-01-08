@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getAllRecipes } from "@/data/recipeStore";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { RecipeImageWithCredit } from "@/components/RecipeImageWithCredit";
 
 const TAG_ICON_CONFIG = [
   {
@@ -85,6 +86,21 @@ export default async function RecipesPage() {
                     data-testid="recipe-card"
                     data-recipe-title={recipe.title}
                   >
+                    {recipe.images?.length ? (
+                      <div className="mb-4">
+                        <RecipeImageWithCredit
+                          image={recipe.images[0]}
+                          utmSource="recipe-lab"
+                          variant="card"
+                          altFallback={recipe.title}
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative w-full h-48 rounded-md bg-muted/20 flex items-center justify-center text-muted text-xs uppercase tracking-wide mb-4">
+                        No image selected yet
+                      </div>
+                    )}
+
                     <h2 className="text-2xl font-semibold mb-2">
                       {recipe.title}
                     </h2>
@@ -103,7 +119,7 @@ export default async function RecipesPage() {
                                 alt={label}
                                 fill
                                 sizes="24px"
-                                className="object-contain"
+                                className="recipe-tag-icon object-contain"
                               />
                             </span>
                             {label}

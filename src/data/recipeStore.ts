@@ -96,3 +96,26 @@ export async function deleteRecipe(id: string): Promise<boolean> {
   const result = await collection.deleteOne({ _id: objectId });
   return result.deletedCount > 0;
 }
+
+export async function updateRecipeWithImages(
+  id: string,
+  images: import('@/types/recipe-image').RecipeImage[]
+): Promise<Recipe | null> {
+  const objectId = toObjectId(id);
+  if (!objectId) return null;
+  const collection = await getCollection();
+  const now = new Date().toISOString();
+
+  const result = await collection.findOneAndUpdate(
+    { _id: objectId },
+    { 
+      $set: { 
+        images: images.slice(0, 3), // Cap at 3 images
+        updatedAt: now 
+      } 
+    },
+    { returnDocument: "after" }
+  );
+
+  return result ? mapDocument(result) : null;
+}

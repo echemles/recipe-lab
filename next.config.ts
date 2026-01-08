@@ -13,6 +13,12 @@ type NextConfigWithAllowedDevOrigins = NextConfig & {
 
 const nextConfig: NextConfigWithAllowedDevOrigins = {
   allowedDevOrigins,
+  // Ensure server-only packages are not bundled into the client
+  serverExternalPackages: ['unsplash-js'],
+  // Allow Unsplash images in next/image
+  images: {
+    domains: ['images.unsplash.com'],
+  },
 };
 
 export default nextConfig;

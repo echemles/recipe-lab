@@ -1,0 +1,41 @@
+{
+  "$schema": "./recipe-seed.schema.json",
+  "recipes": [
+    {
+      "title": "Test Recipe Alpha",
+      "description": "A test recipe for E2E testing - first seed recipe",
+      "ingredients": [
+        { "quantity": 2, "unit": "cups", "name": "flour", "note": "all-purpose" },
+        { "quantity": 1, "unit": "cup", "name": "sugar" },
+        { "quantity": 2, "unit": "tsp", "name": "baking powder" }
+      ],
+      "steps": [
+        "Mix dry ingredients together",
+        "Add wet ingredients and mix well",
+        "Bake at 350°F for 30 minutes"
+      ],
+      "prepTimeMinutes": 15,
+      "cookTimeMinutes": 30,
+      "servings": 8,
+      "tags": ["test", "baking", "simple" ]
+    },
+    {
+      "title": "Test Recipe Beta",
+      "description": "A test recipe for E2E testing - second seed recipe",
+      "ingredients": [
+        { "quantity": 1, "unit": "lb", "name": "ground beef" },
+        { "quantity": 1, "unit": "onion", "name": "onion", "note": "diced" },
+        { "quantity": 2, "unit": "cups", "name": "tomato sauce" }
+      ],
+      "steps": [
+        "Brown the ground beef",
+        "Add diced onion and cook until soft",
+        "Add tomato sauce and simmer for 20 minutes"
+      ],
+      "prepTimeMinutes": 10,
+      "cookTimeMinutes": 25,
+      "servings": 4,
+      "tags": ["test", "dinner", "meat" ]
+    }
+  ]
+}

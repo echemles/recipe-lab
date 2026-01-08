@@ -17,6 +17,7 @@ export interface Recipe {
   cookTimeMinutes?: number;
   servings?: number;
   tags?: string[];
+  images?: import('./recipe-image').RecipeImage[];
   createdAt: string;
   updatedAt: string;
 }
