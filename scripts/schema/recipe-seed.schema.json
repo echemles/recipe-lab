@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://echemles.github.io/recipe-lab/schema/recipe-seed.schema.json",
+  "title": "Recipe Seed File",
+  "description": "Validates recipe seed JSON consumed by scripts/test-db-setup.ts and related tooling.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recipes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/recipe"
+      }
+    }
+  },
+  "required": ["recipes"],
+  "definitions": {
+    "ingredient": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "quantity": {
+          "type": "number"
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string"
+        },
+        "tooltip": {
+          "type": "string"
+        },
+        "isSubrecipe": {
+          "type": "boolean"
+        }
+      },
+      "required": ["quantity", "unit", "name"]
+    },
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{24}$",
+          "description": "Optional MongoDB ObjectId string (24 hex chars)."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ingredients": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/ingredient"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "prepTimeMinutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "cookTimeMinutes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "servings": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["title", "description", "ingredients", "steps"],
+      "allOf": [
+        {
+          "if": {
+            "required": ["createdAt"]
+          },
+          "then": {
+            "required": ["updatedAt"]
+          }
+        }
+      ]
+    }
+  }
+}
