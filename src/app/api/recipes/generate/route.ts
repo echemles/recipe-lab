@@ -2,8 +2,20 @@ import { NextResponse } from "next/server";
 import { generateRecipeDraft } from "@/lib/aiRecipe";
 
 type GenerateRecipeRequest = {
-  prompt?: string;
+  title?: string;
+  description?: string;
   pantryItems?: string[];
+  palateLevel?: number;
+  preferences?: {
+    highProtein?: boolean;
+    quickMeal?: boolean;
+    lowCalorie?: boolean;
+    mealPrepFriendly?: boolean;
+    lowCost?: boolean;
+    budgetFriendly?: boolean;
+    lowCarb?: boolean;
+    glutenFree?: boolean;
+  };
 };
 
 export async function POST(request: Request) {
@@ -19,8 +31,11 @@ export async function POST(request: Request) {
 
   try {
     const recipe = await generateRecipeDraft({
-      prompt: body.prompt,
+      title: body.title,
+      description: body.description,
       pantryItems: body.pantryItems,
+      palateLevel: body.palateLevel,
+      preferences: body.preferences,
     });
     return NextResponse.json({ recipe });
   } catch (error) {

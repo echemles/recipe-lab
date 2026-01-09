@@ -166,7 +166,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               return (
                 <div key={`${ingredient.name}-${index}`} className="contents">
                   <div className="rounded-[--radius-input] bg-surface-2 p-3">
-                    <span className="quantity block text-right font-mono">
+                    <span className="quantity block text-right">
                       {formatQuantity(scaledQuantity)}
                     </span>
                   </div>

@@ -37,7 +37,7 @@ export default function RootLayout({
           <header className="border-b border-border bg-surface-1/80 backdrop-blur-sm">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
               <Link
-                href="/recipes"
+                href="/"
                 className="text-lg font-semibold tracking-[0.5rem] uppercase flex items-center gap-2"
               >
                 <span>RECIPE LAB</span>

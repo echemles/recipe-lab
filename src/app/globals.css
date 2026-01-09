@@ -85,6 +85,13 @@
   --bg-ai-dark: var(--bg-ai-dark);
 }
 
+/* Apple-inspired gradient utilities */
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+}
+
 /* Typography System */
 body {
   font-family: var(--font-sans);
@@ -210,7 +217,7 @@ h1 {
 }
 h2 { 
   font-weight: 580;
-  letter-spacing: 0.1rem;
+  letter-spacing: -0.03em;
   font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "wght" 580;
 }
 h3 { 

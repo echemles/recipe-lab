@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { Recipe } from "@/types/recipe";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
@@ -11,7 +13,22 @@ type CreatedRecipeResponse = {
   recipe: Recipe;
 };
 
+type RecipeDraft = Omit<Recipe, "id" | "createdAt" | "updatedAt">;
+
+const LOADING_MESSAGES = [
+  "Simmering up something delicious…",
+  "Gathering herbs from the AI garden…",
+  "Preheating the imagination oven…",
+  "Plating your prompt with extra flair…",
+  "Whisking flavors into perfect harmony…",
+];
+
+function getRandomLoadingMessage() {
+  return LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)];
+}
+
 export default function AiAddRecipePage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [pantryInput, setPantryInput] = useState("");
@@ -29,6 +46,26 @@ export default function AiAddRecipePage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [createdRecipe, setCreatedRecipe] = useState<Recipe | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalState, setModalState] = useState<
+    "idle" | "loading" | "preview" | "saving" | "error" | "redirecting"
+  >("idle");
+  const [loadingMessage, setLoadingMessage] = useState(getRandomLoadingMessage());
+  const [generatedRecipe, setGeneratedRecipe] = useState<RecipeDraft | null>(null);
+  const [modalError, setModalError] = useState("");
+  const [redirectingRecipe, setRedirectingRecipe] = useState<Recipe | null>(null);
+  const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const canCloseModal = modalState !== "saving" && modalState !== "redirecting";
+  const showPreview = modalState === "preview" && generatedRecipe;
+  const isSaving = modalState === "saving";
+
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        clearTimeout(redirectTimeoutRef.current);
+      }
+    };
+  }, []);
 
   function handleAddPantryItem() {
     const trimmed = pantryInput.trim();
@@ -49,50 +86,98 @@ export default function AiAddRecipePage() {
     }
   }
 
+  function buildGenerationPayload() {
+    return {
+      title: title.trim() || undefined,
+      description: description.trim() || undefined,
+      pantryItems,
+      palateLevel,
+      preferences: {
+        highProtein,
+        quickMeal,
+        lowCalorie,
+        mealPrepFriendly,
+        lowCost,
+        budgetFriendly,
+        lowCarb,
+        glutenFree,
+      },
+    };
+  }
+
+  async function generateRecipeFromInputs() {
+    setSubmitting(true);
+    setIsModalOpen(true);
+    setModalState("loading");
+    setLoadingMessage(getRandomLoadingMessage());
+    setModalError("");
+
+    try {
+      const response = await fetch("/api/recipes/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(buildGenerationPayload()),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.message ?? "Unable to generate recipe.");
+      }
+
+      setGeneratedRecipe(data.recipe as RecipeDraft);
+      setModalState("preview");
+    } catch (err) {
+      setModalState("error");
+      setModalError(err instanceof Error ? err.message : "Failed to generate recipe.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSuccessMessage("");
     setCreatedRecipe(null);
+    setGeneratedRecipe(null);
+    setModalError("");
 
     if (!description.trim() && pantryItems.length === 0) {
       setError("Provide a recipe description or at least one pantry item.");
       return;
     }
 
-    setSubmitting(true);
+    await generateRecipeFromInputs();
+  }
+
+  async function handleRetryGenerate() {
+    setModalState("loading");
+    setLoadingMessage(getRandomLoadingMessage());
+    await generateRecipeFromInputs();
+  }
+
+  async function handleSaveGeneratedRecipe() {
+    if (!generatedRecipe) return;
+    setModalState("saving");
+    setModalError("");
+
     try {
-      const response = await fetch("/api/recipes/ai-add", {
+      const response = await fetch("/api/recipes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim() || undefined,
-          description: description.trim() || undefined,
-          pantryItems,
-          palateLevel,
-          preferences: {
-            highProtein,
-            quickMeal,
-            lowCalorie,
-            mealPrepFriendly,
-            lowCost,
-            budgetFriendly,
-            lowCarb,
-            glutenFree,
-          },
-        }),
+        body: JSON.stringify(generatedRecipe),
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(body?.message ?? "Unable to save recipe.");
+        throw new Error(data?.message ?? "Unable to save recipe.");
       }
 
-      const data = (await response.json()) as CreatedRecipeResponse;
-      setCreatedRecipe(data.recipe);
-      setSuccessMessage(
-        `"${data.recipe.title}" saved! Review it anytime from your recipe list.`
-      );
+      const createdRecipe = data as Recipe;
+      setCreatedRecipe(createdRecipe);
+      setRedirectingRecipe(createdRecipe);
+      setGeneratedRecipe(null);
+      setLoadingMessage(getRandomLoadingMessage());
       setTitle("");
       setDescription("");
       setPantryItems([]);
@@ -105,11 +190,22 @@ export default function AiAddRecipePage() {
       setBudgetFriendly(false);
       setLowCarb(false);
       setGlutenFree(false);
+      setModalState("redirecting");
+      redirectTimeoutRef.current = setTimeout(() => {
+        router.push(`/recipe/${createdRecipe.id}`);
+      }, 900);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save recipe.");
-    } finally {
-      setSubmitting(false);
+      setModalState("error");
+      setModalError(err instanceof Error ? err.message : "Failed to save recipe.");
     }
+  }
+
+  function handleCloseModal() {
+    setIsModalOpen(false);
+    setModalState("idle");
+    setGeneratedRecipe(null);
+    setModalError("");
+    setLoadingMessage(getRandomLoadingMessage());
   }
 
   return (
@@ -437,6 +533,165 @@ export default function AiAddRecipePage() {
           </Card>
         )}
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => {
+              if (canCloseModal) handleCloseModal();
+            }}
+          />
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{
+              scale: modalState === "redirecting" ? 0.85 : 1,
+              maxWidth: modalState === "redirecting" ? 360 : 768,
+            }}
+            transition={{ type: "spring", stiffness: 220, damping: 26 }}
+            className="relative z-10 w-full p-0 overflow-hidden"
+          >
+            <Card className="w-full h-full">
+              {modalState === "loading" && (
+                <div className="bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)] p-10 text-center space-y-6">
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="text-4xl animate-bounce">🍳</span>
+                    <span className="text-4xl animate-pulse">🧠</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 text-muted text-sm uppercase tracking-[0.3em]">
+                    <span className="h-2 w-2 rounded-full bg-accent animate-ping" />
+                    Crafting Your Recipe
+                    <span className="h-2 w-2 rounded-full bg-accent animate-ping" />
+                  </div>
+                  <p className="text-2xl font-semibold">{loadingMessage}</p>
+                  <p className="text-sm text-muted max-w-lg mx-auto">
+                    We&apos;re chatting with our culinary co-pilot. Hang tight while it sautés ideas into a full recipe blueprint.
+                  </p>
+                </div>
+              )}
+            {modalState === "error" && (
+              <div className="p-8 space-y-6">
+                <div className="flex items-center gap-3 text-red-600">
+                  <span className="text-3xl">⚠️</span>
+                  <div>
+                    <h3 className="text-xl font-semibold">Something burnt the soufflé</h3>
+                    <p className="text-sm text-muted">{modalError}</p>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <Button variant="secondary" onClick={handleRetryGenerate} disabled={submitting}>
+                    Try Again
+                  </Button>
+                  <Button variant="ghost" onClick={handleCloseModal}>
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+            {showPreview && (
+              <div className="p-8 space-y-6">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.3em] text-muted">Preview Recipe</p>
+                    <h2 className="text-3xl font-bold mt-2">{generatedRecipe.title}</h2>
+                    <p className="text-muted mt-3">{generatedRecipe.description}</p>
+                  </div>
+                  <button
+                    className="text-muted hover:text-text"
+                    onClick={handleCloseModal}
+                    disabled={!canCloseModal}
+                    aria-label="Close preview"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">Ingredients</h3>
+                    <ul className="mt-3 space-y-2 text-sm">
+                      {generatedRecipe.ingredients.map((ingredient, idx) => (
+                        <li key={`${ingredient.name}-${idx}`} className="flex items-start gap-2">
+                          <span className="text-accent mt-1">•</span>
+                          <span>
+                            {ingredient.quantity ? `${ingredient.quantity} ` : ""}
+                            {ingredient.unit ? `${ingredient.unit} ` : ""}
+                            {ingredient.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">Steps</h3>
+                    <ol className="mt-3 list-decimal pl-5 space-y-2 text-sm">
+                      {generatedRecipe.steps.map((step, idx) => (
+                        <li key={idx}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-3 text-xs uppercase tracking-wide text-muted">
+                  {generatedRecipe.prepTimeMinutes && (
+                    <span className="rounded-full border border-border px-4 py-1">
+                      Prep {generatedRecipe.prepTimeMinutes} min
+                    </span>
+                  )}
+                  {generatedRecipe.cookTimeMinutes && (
+                    <span className="rounded-full border border-border px-4 py-1">
+                      Cook {generatedRecipe.cookTimeMinutes} min
+                    </span>
+                  )}
+                  {generatedRecipe.servings && (
+                    <span className="rounded-full border border-border px-4 py-1">
+                      Serves {generatedRecipe.servings}
+                    </span>
+                  )}
+                  {(generatedRecipe.tags ?? []).map((tag) => (
+                    <span key={tag} className="rounded-full border border-border px-4 py-1">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+                  <Button variant="ghost" onClick={handleCloseModal} disabled={!canCloseModal}>
+                    Dismiss
+                  </Button>
+                  <Button onClick={handleSaveGeneratedRecipe} disabled={isSaving}>
+                    {isSaving ? "Saving…" : "Save to Recipes"}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {modalState === "redirecting" && redirectingRecipe && (
+              <div className="p-10 text-center space-y-5 bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)]">
+                <div className="flex items-center justify-center gap-3 text-4xl">
+                  <motion.span
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.2 }}
+                  >
+                    🚀
+                  </motion.span>
+                  <motion.span
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                  >
+                    🍽️
+                  </motion.span>
+                </div>
+                <p className="text-sm uppercase tracking-[0.3em] text-muted">
+                  Redirecting
+                </p>
+                <p className="text-2xl font-semibold">
+                  Opening {redirectingRecipe.title}
+                </p>
+                <p className="text-muted text-sm max-w-sm mx-auto">
+                  We saved your recipe and we’re taking you to the full details now.
+                </p>
+              </div>
+            )}
+            </Card>
+          </motion.div>
+        </div>
+      )}
     </main>
   );
 }
