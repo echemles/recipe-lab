@@ -1,18 +1,21 @@
 import { HeroSection } from "@/components/landing/HeroSection";
 import { InsightSection } from "@/components/landing/InsightSection";
 import { HowItWorksSection } from "@/components/landing/HowItWorksSection";
+import { AssembleDemoSection } from "@/components/landing/AssembleDemoSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
-import { SectionDivider } from "@/components/landing/SectionDivider";
+import { FlowLineDivider } from "@/components/landing/FlowLineDivider";
 
 export default function Home() {
   return (
-    <main className="landing-page flex flex-col gap-24 md:gap-32 pb-24">
+    <main className="landing-page flex flex-col gap-12 sm:gap-16 md:gap-24 lg:gap-24 pb-20 sm:pb-24">
       <HeroSection />
-      <SectionDivider />
+      <FlowLineDivider />
       <InsightSection />
-      <SectionDivider />
+      <FlowLineDivider />
       <HowItWorksSection />
-      <SectionDivider />
+      <FlowLineDivider />
+      <AssembleDemoSection />
+      <FlowLineDivider />
       <FinalCTASection />
     </main>
   );

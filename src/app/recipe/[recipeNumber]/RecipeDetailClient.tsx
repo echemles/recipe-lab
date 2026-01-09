@@ -72,9 +72,9 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center py-16">
-      <div className="w-full max-w-4xl">
-        <div className="mb-6 flex items-center justify-between text-sm">
+    <main className="flex min-h-screen flex-col items-center py-16 recipe-detail-animate">
+      <div className="w-full max-w-4xl space-y-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm recipe-detail-section" style={{ animationDelay: "60ms" }}>
           <Link href="/recipes">
             <Button variant="ghost" size="sm">
               ← Back to recipes
@@ -87,25 +87,29 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
           </Link>
         </div>
 
-        <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
-        <p className="text-muted mb-8">{recipe.description}</p>
+        <div className="recipe-detail-section" style={{ animationDelay: "120ms" }}>
+          <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
+          <p className="text-muted">{recipe.description}</p>
+        </div>
 
-        {recipe.images?.length ? (
-          <div className="mb-8">
-            <RecipeImageWithCredit
-              image={recipe.images[0]}
-              utmSource="recipe-lab"
-              variant="hero"
-              altFallback={recipe.title}
-            />
-          </div>
-        ) : (
-          <div className="relative w-full h-96 rounded-lg bg-muted/20 flex items-center justify-center text-muted text-sm uppercase tracking-wide mb-8">
-            No image selected yet
-          </div>
-        )}
+        <div className="recipe-detail-section" style={{ animationDelay: "180ms" }}>
+          {recipe.images?.length ? (
+            <div className="mb-8">
+              <RecipeImageWithCredit
+                image={recipe.images[0]}
+                utmSource="recipe-lab"
+                variant="hero"
+                altFallback={recipe.title}
+              />
+            </div>
+          ) : (
+            <div className="relative w-full h-96 rounded-lg bg-muted/20 flex items-center justify-center text-muted text-sm uppercase tracking-wide mb-8">
+              No image selected yet
+            </div>
+          )}
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 recipe-detail-section" style={{ animationDelay: "220ms" }}>
           {recipe.prepTimeMinutes !== undefined && (
             <Card className="p-4">
               <p className="text-sm text-muted">Prep Time</p>
@@ -158,31 +162,34 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
           </Card>
         </div>
 
-        <div className="mb-8">
+        <div className="recipe-detail-section" style={{ animationDelay: "280ms" }}>
           <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
-          <div className="ingredient-list">
+          <div className="ingredient-list flex flex-col gap-3">
             {recipe.ingredients.map((ingredient, index) => {
               const scaledQuantity = ingredient.quantity * scaleFactor;
               return (
-                <div key={`${ingredient.name}-${index}`} className="contents">
-                  <div className="rounded-[--radius-input] bg-surface-2 p-3">
-                    <span className="quantity block text-right">
+                <div
+                  key={`${ingredient.name}-${index}`}
+                  className="ingredient-item flex flex-col gap-2 rounded-[--radius-input] bg-surface-1/30 border border-border/20 p-3 sm:grid sm:grid-cols-[minmax(140px,200px)_1fr] sm:items-center sm:gap-4"
+                >
+                  <div className="ingredient-amount flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                    <span className="ingredient-quantity text-lg font-semibold">
                       {formatQuantity(scaledQuantity)}
                     </span>
-                  </div>
-                  <div className="rounded-[--radius-input] bg-surface-2 p-3">
-                    <span className="unit">{ingredient.unit}</span>
-                  </div>
-                  <div className="rounded-[--radius-input] bg-surface-2 p-3">
-                    <span className="name">
-                      <span>
-                        {ingredient.name}
-                        {ingredient.note && (
-                          <span className="text-muted ml-2">({ingredient.note})</span>
-                        )}
+                    {ingredient.unit && (
+                      <span className="ingredient-unit uppercase tracking-wide text-xs text-muted">
+                        {ingredient.unit}
                       </span>
-                      {ingredient.tooltip && <TooltipIcon label={ingredient.tooltip} />}
+                    )}
+                  </div>
+                  <div className="ingredient-name flex items-start justify-between gap-3 rounded-[--radius-input] bg-surface-2 px-3 py-2 sm:bg-transparent sm:px-0 sm:py-0">
+                    <span className="font-medium leading-snug">
+                      {ingredient.name}
+                      {ingredient.note && (
+                        <span className="ingredient-note text-muted ml-2">({ingredient.note})</span>
+                      )}
                     </span>
+                    {ingredient.tooltip && <TooltipIcon label={ingredient.tooltip} />}
                   </div>
                 </div>
               );
@@ -190,7 +197,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="recipe-detail-section" style={{ animationDelay: "320ms" }}>
           <h2 className="text-2xl font-semibold mb-4">Steps</h2>
           <ol className="list-decimal list-inside space-y-2">
             {recipe.steps.map((step, index) => (
@@ -200,7 +207,7 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
         </div>
 
         {recipe.tags && recipe.tags.length > 0 && (
-          <div>
+          <div className="recipe-detail-section" style={{ animationDelay: "360ms" }}>
             <h2 className="text-2xl font-semibold mb-4">Tags</h2>
             <div className="flex flex-wrap gap-2">
               {recipe.tags.map((tag) => (

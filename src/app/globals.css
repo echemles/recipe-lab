@@ -36,6 +36,8 @@
   --bg-ai-light: linear-gradient(160deg, hsl(220 20% 98%) 0%, hsl(258 40% 97%) 45%, hsl(220 18% 96%) 100%);
   --bg-ai-dark: linear-gradient(160deg, hsl(230 15% 7%) 0%, hsl(258 35% 14%) 45%, hsl(230 15% 11%) 100%);
 
+  --landing-header-height: 96px;
+
   color-scheme: light;
 }
 
@@ -100,6 +102,7 @@ body {
   letter-spacing: 0.005em;
   background: var(--bg-ai-light);
   color: hsl(var(--text));
+  scroll-behavior: smooth;
   transition-property: background-color, border-color, color;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
@@ -107,6 +110,99 @@ body {
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01", "ss02";
   font-variation-settings: "opsz" 32, "slnt" 0, "GRAD" 0, "wght" 440;
+}
+
+.landing-page {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+@media (max-width: 1023px) {
+  .landing-page {
+    gap: 0;
+  }
+
+  .landing-section {
+    min-height: auto;
+    padding: 3rem 1.5rem;
+    position: relative;
+  }
+
+  .landing-section:nth-child(odd) {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      hsl(var(--surface-1) / 0.15) 15%,
+      hsl(var(--surface-1) / 0.15) 85%,
+      transparent 100%
+    );
+  }
+
+  .landing-section.hero-section {
+    min-height: 85vh;
+    padding-top: calc(var(--landing-header-height) + 2rem);
+    padding-bottom: 4rem;
+    background: transparent;
+  }
+
+  .landing-divider {
+    padding: 2rem 0;
+    min-height: auto;
+  }
+
+  .landing-divider svg {
+    opacity: 0.6;
+  }
+}
+
+:where(html, body):has(.landing-page) {
+  scroll-snap-type: none;
+}
+
+@media (min-width: 1024px) {
+  :where(html, body):has(.landing-page) {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 0;
+  }
+
+  .landing-section {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .landing-divider {
+    scroll-snap-align: none;
+    min-height: auto;
+  }
+
+  .landing-footer {
+    scroll-snap-align: end;
+    scroll-snap-stop: always;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(html, body):has(.landing-page) {
+    scroll-snap-type: none;
+  }
+  
+  .landing-section {
+    scroll-snap-align: none;
+    scroll-snap-stop: normal;
+  }
+}
+
+.landing-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.landing-section.hero-section {
+  min-height: 100vh;
+  padding-top: var(--landing-header-height);
 }
 
 .dark body {
@@ -165,39 +261,86 @@ body {
   animation: recipeCardFadeIn 500ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+.recipe-detail-animate {
+  animation: recipeCardFadeIn 600ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.recipe-detail-section {
+  opacity: 0;
+  animation: recipeDetailSection 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes recipeDetailSection {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aiLoadingHaloPulse {
+  0% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+  45% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+}
+
+@keyframes aiLoadingEmojiFloat {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.ai-loading-halo {
+  animation: aiLoadingHaloPulse 4.5s ease-in-out infinite;
+}
+
+.ai-loading-emoji {
+  animation: aiLoadingEmojiFloat 3.2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .recipe-card-animate {
     animation: none;
     opacity: 1;
+  }
+
+  .recipe-detail-animate,
+  .recipe-detail-section {
+    animation: none;
+    opacity: 1;
+  }
+
+  .ai-loading-halo,
+  .ai-loading-emoji {
+    animation: none;
   }
 }
 
 /* Page-specific overrides */
 main.recipes-listing h2 {
   letter-spacing: 0;
-}
-
-/* Ingredient alignment */
-.ingredient-list {
-  display: grid;
-  grid-template-columns: 80px 80px 1fr;
-  gap: 0.75rem;
-  align-items: start;
-}
-
-.ingredient-list .quantity {
-  text-align: right;
-  font-weight: 600;
-}
-
-.ingredient-list .unit {
-  font-weight: 600;
-}
-
-.ingredient-list .name {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 /* Modern Heading Typography */

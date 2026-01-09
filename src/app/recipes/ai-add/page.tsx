@@ -16,11 +16,11 @@ type CreatedRecipeResponse = {
 type RecipeDraft = Omit<Recipe, "id" | "createdAt" | "updatedAt">;
 
 const LOADING_MESSAGES = [
-  "Simmering up something delicious…",
-  "Gathering herbs from the AI garden…",
-  "Preheating the imagination oven…",
-  "Plating your prompt with extra flair…",
-  "Whisking flavors into perfect harmony…",
+  "Composing flavors with quiet precision.",
+  "Layering textures for perfect balance.",
+  "Curating ingredients to suit your brief.",
+  "Refining steps for a graceful flow.",
+  "Tasting every detail before the reveal.",
 ];
 
 function getRandomLoadingMessage() {
@@ -47,17 +47,16 @@ export default function AiAddRecipePage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [createdRecipe, setCreatedRecipe] = useState<Recipe | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalState, setModalState] = useState<
-    "idle" | "loading" | "preview" | "saving" | "error" | "redirecting"
-  >("idle");
+  const [modalState, setModalState] = useState<"idle" | "loading" | "preview" | "error" | "redirecting">("idle");
   const [loadingMessage, setLoadingMessage] = useState(getRandomLoadingMessage());
   const [generatedRecipe, setGeneratedRecipe] = useState<RecipeDraft | null>(null);
   const [modalError, setModalError] = useState("");
   const [redirectingRecipe, setRedirectingRecipe] = useState<Recipe | null>(null);
+  const [redirectTitle, setRedirectTitle] = useState("");
   const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const canCloseModal = modalState !== "saving" && modalState !== "redirecting";
+  const canCloseModal = modalState !== "redirecting";
   const showPreview = modalState === "preview" && generatedRecipe;
-  const isSaving = modalState === "saving";
+  const isRedirecting = modalState === "redirecting";
 
   useEffect(() => {
     return () => {
@@ -158,8 +157,10 @@ export default function AiAddRecipePage() {
 
   async function handleSaveGeneratedRecipe() {
     if (!generatedRecipe) return;
-    setModalState("saving");
+    setRedirectTitle(generatedRecipe.title ?? "your recipe");
+    setModalState("redirecting");
     setModalError("");
+    setRedirectingRecipe(null);
 
     try {
       const response = await fetch("/api/recipes", {
@@ -176,6 +177,7 @@ export default function AiAddRecipePage() {
       const createdRecipe = data as Recipe;
       setCreatedRecipe(createdRecipe);
       setRedirectingRecipe(createdRecipe);
+      setRedirectTitle(createdRecipe.title);
       setGeneratedRecipe(null);
       setLoadingMessage(getRandomLoadingMessage());
       setTitle("");
@@ -190,11 +192,11 @@ export default function AiAddRecipePage() {
       setBudgetFriendly(false);
       setLowCarb(false);
       setGlutenFree(false);
-      setModalState("redirecting");
       redirectTimeoutRef.current = setTimeout(() => {
         router.push(`/recipe/${createdRecipe.id}`);
       }, 900);
     } catch (err) {
+      setRedirectTitle("");
       setModalState("error");
       setModalError(err instanceof Error ? err.message : "Failed to save recipe.");
     }
@@ -205,15 +207,16 @@ export default function AiAddRecipePage() {
     setModalState("idle");
     setGeneratedRecipe(null);
     setModalError("");
+    setRedirectTitle("");
     setLoadingMessage(getRandomLoadingMessage());
   }
 
   return (
     <main className="flex min-h-screen flex-col items-center py-16">
       <div className="w-full max-w-3xl space-y-8">
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2">AI Recipe Generator</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2">AI Recipe Generator</h1>
             <p className="text-muted">Describe what you want, and AI will create a complete recipe</p>
           </div>
           <Link href="/recipes">
@@ -287,7 +290,7 @@ export default function AiAddRecipePage() {
               <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="pantryInput">
                 Add Pantry Items
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   id="pantryInput"
                   type="text"
@@ -363,9 +366,9 @@ export default function AiAddRecipePage() {
 
             <div>
               <label className="block text-sm font-medium mb-3 tracking-[0.005em]">
-                Dietary Requirements (Optional)
+                Additional Preferences (Optional)
               </label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
@@ -419,15 +422,6 @@ export default function AiAddRecipePage() {
                     className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
                   />
                   <span className="text-sm">Meal-Prep Friendly</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={budgetFriendly}
-                    onChange={(e) => setBudgetFriendly(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
-                  />
-                  <span className="text-sm">Budget-Friendly</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
@@ -552,20 +546,26 @@ export default function AiAddRecipePage() {
           >
             <Card className="w-full h-full">
               {modalState === "loading" && (
-                <div className="bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)] p-10 text-center space-y-6">
-                  <div className="flex items-center justify-center gap-3">
-                    <span className="text-4xl animate-bounce">🍳</span>
-                    <span className="text-4xl animate-pulse">🧠</span>
+                <div className="bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)] p-12">
+                  <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">
+                    <div className="relative flex items-center justify-center">
+                      <div className="ai-loading-halo absolute inset-0 rounded-full bg-gradient-to-br from-white/50 via-white/5 to-transparent blur-3xl dark:from-white/10 dark:via-white/5 dark:to-transparent" />
+                      <div className="relative flex size-28 items-center justify-center rounded-full border border-white/60 bg-white/80 shadow-[0_25px_80px_rgba(12,16,35,0.25)] backdrop-blur-3xl dark:border-white/10 dark:bg-white/5">
+                        <span className="ai-loading-emoji text-5xl" role="img" aria-label="Apple inspired chef">
+                          🍏
+                        </span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <p className="text-[0.65rem] uppercase tracking-[0.55em] text-muted">AI Mise en Place</p>
+                      <p className="text-3xl font-semibold leading-snug">{loadingMessage}</p>
+                      <p className="text-sm text-muted max-w-xs mx-auto">
+                        A quiet pause while our culinary model balances acid, heat, and rhythm just for you.
+                      </p>
+                    </div>
+                    <div className="h-px w-28 bg-gradient-to-r from-transparent via-accent/60 to-transparent" />
+                    <p className="text-xs uppercase tracking-[0.35em] text-muted">Almost ready</p>
                   </div>
-                  <div className="flex items-center justify-center gap-3 text-muted text-sm uppercase tracking-[0.3em]">
-                    <span className="h-2 w-2 rounded-full bg-accent animate-ping" />
-                    Crafting Your Recipe
-                    <span className="h-2 w-2 rounded-full bg-accent animate-ping" />
-                  </div>
-                  <p className="text-2xl font-semibold">{loadingMessage}</p>
-                  <p className="text-sm text-muted max-w-lg mx-auto">
-                    We&apos;re chatting with our culinary co-pilot. Hang tight while it sautés ideas into a full recipe blueprint.
-                  </p>
                 </div>
               )}
             {modalState === "error" && (
@@ -577,7 +577,7 @@ export default function AiAddRecipePage() {
                     <p className="text-sm text-muted">{modalError}</p>
                   </div>
                 </div>
-                <div className="flex justify-end gap-3">
+                <div className="flex flex-col sm:flex-row justify-end gap-3">
                   <Button variant="secondary" onClick={handleRetryGenerate} disabled={submitting}>
                     Try Again
                   </Button>
@@ -635,9 +635,11 @@ export default function AiAddRecipePage() {
                       Prep {generatedRecipe.prepTimeMinutes} min
                     </span>
                   )}
-                  {generatedRecipe.cookTimeMinutes && (
+                  {typeof generatedRecipe.cookTimeMinutes === "number" && (
                     <span className="rounded-full border border-border px-4 py-1">
-                      Cook {generatedRecipe.cookTimeMinutes} min
+                      {generatedRecipe.cookTimeMinutes === 0
+                        ? "No cook time"
+                        : `Cook ${generatedRecipe.cookTimeMinutes} min`}
                     </span>
                   )}
                   {generatedRecipe.servings && (
@@ -651,17 +653,17 @@ export default function AiAddRecipePage() {
                     </span>
                   ))}
                 </div>
-                <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
+                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-border/50">
                   <Button variant="ghost" onClick={handleCloseModal} disabled={!canCloseModal}>
                     Dismiss
                   </Button>
-                  <Button onClick={handleSaveGeneratedRecipe} disabled={isSaving}>
-                    {isSaving ? "Saving…" : "Save to Recipes"}
+                  <Button onClick={handleSaveGeneratedRecipe} disabled={isRedirecting}>
+                    {isRedirecting ? "Saving…" : "Save to Recipes"}
                   </Button>
                 </div>
               </div>
             )}
-            {modalState === "redirecting" && redirectingRecipe && (
+            {modalState === "redirecting" && (
               <div className="p-10 text-center space-y-5 bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)]">
                 <div className="flex items-center justify-center gap-3 text-4xl">
                   <motion.span
@@ -681,7 +683,7 @@ export default function AiAddRecipePage() {
                   Redirecting
                 </p>
                 <p className="text-2xl font-semibold">
-                  Opening {redirectingRecipe.title}
+                  Opening {redirectingRecipe?.title ?? redirectTitle}
                 </p>
                 <p className="text-muted text-sm max-w-sm mx-auto">
                   We saved your recipe and we’re taking you to the full details now.
