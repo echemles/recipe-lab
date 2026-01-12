@@ -5,7 +5,13 @@ type GenerateRecipeRequest = {
   title?: string;
   description?: string;
   pantryItems?: string[];
-  palateLevel?: number;
+  cookingMode?: "beginner" | "traditional" | "weeknight" | "chef" | "experimental";
+  constraints?: {
+    techniqueComplexity: string;
+    allowedVariations: string;
+    specialtyIngredients: boolean;
+    guidanceLevel: string;
+  };
   preferences?: {
     highProtein?: boolean;
     quickMeal?: boolean;
@@ -34,10 +40,11 @@ export async function POST(request: Request) {
       title: body.title,
       description: body.description,
       pantryItems: body.pantryItems,
-      palateLevel: body.palateLevel,
+      cookingMode: body.cookingMode,
+      constraints: body.constraints,
       preferences: body.preferences,
     });
-    return NextResponse.json({ recipe });
+    return NextResponse.json(recipe);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : "Failed to generate recipe.";

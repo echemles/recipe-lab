@@ -7,6 +7,7 @@ import { TooltipIcon } from "@/components/TooltipIcon";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { RecipeImageWithCredit } from "@/components/RecipeImageWithCredit";
+import { PrimaryNutritionMetrics } from "@/components/recipe/PrimaryNutritionMetrics";
 
 interface RecipeDetailClientProps {
   recipe: Recipe;
@@ -30,6 +31,8 @@ function sanitizeNumericInput(value: string) {
 
 function formatQuantity(value: number) {
   if (Number.isNaN(value)) return "-";
+  // If quantity is 0 or very small, it might be "to taste"
+  if (value === 0 || value < 0.01) return "";
   return Math.round(value).toString();
 }
 
@@ -162,34 +165,53 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
           </Card>
         </div>
 
+        {recipe.macros && (
+          <div className="recipe-detail-section" style={{ animationDelay: "250ms" }}>
+            <h2 className="text-2xl font-semibold mb-4">Nutrition Information</h2>
+            
+            <PrimaryNutritionMetrics macros={recipe.macros} scaleFactor={scaleFactor} />
+            
+            <p className="text-xs text-muted mt-4">
+              Estimated nutrition information per serving ({servings} {servings === 1 ? 'serving' : 'servings'})
+            </p>
+          </div>
+        )}
+
         <div className="recipe-detail-section" style={{ animationDelay: "280ms" }}>
           <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
-          <div className="ingredient-list flex flex-col gap-3">
+          <div className="space-y-3">
             {recipe.ingredients.map((ingredient, index) => {
               const scaledQuantity = ingredient.quantity * scaleFactor;
+              const quantityText = formatQuantity(scaledQuantity);
               return (
-                <div
-                  key={`${ingredient.name}-${index}`}
-                  className="ingredient-item flex flex-col gap-2 rounded-[--radius-input] bg-surface-1/30 border border-border/20 p-3 sm:grid sm:grid-cols-[minmax(140px,200px)_1fr] sm:items-center sm:gap-4"
-                >
-                  <div className="ingredient-amount flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-                    <span className="ingredient-quantity text-lg font-semibold">
-                      {formatQuantity(scaledQuantity)}
-                    </span>
-                    {ingredient.unit && (
-                      <span className="ingredient-unit uppercase tracking-wide text-xs text-muted">
-                        {ingredient.unit}
+                <div key={`${ingredient.name}-${index}`} className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-surface-1/30 hover:bg-surface-1/50 transition-colors">
+                  <div className="flex items-center gap-2 min-w-0 flex-shrink-0">
+                    {quantityText && (
+                      <>
+                        <span className="font-semibold text-sm sm:text-base text-accent">
+                          {quantityText}
+                        </span>
+                        <span className="font-semibold text-sm sm:text-base text-accent">
+                          {ingredient.unit}
+                        </span>
+                      </>
+                    )}
+                    {!quantityText && (
+                      <span className="text-sm sm:text-base text-muted italic">
+                        to taste
                       </span>
                     )}
                   </div>
-                  <div className="ingredient-name flex items-start justify-between gap-3 rounded-[--radius-input] bg-surface-2 px-3 py-2 sm:bg-transparent sm:px-0 sm:py-0">
-                    <span className="font-medium leading-snug">
-                      {ingredient.name}
+                  <div className="flex-grow min-w-0">
+                    <span className="text-sm sm:text-base">
+                      <span className="font-medium">
+                        {ingredient.name}
+                      </span>
                       {ingredient.note && (
-                        <span className="ingredient-note text-muted ml-2">({ingredient.note})</span>
+                        <span className="text-muted ml-2">({ingredient.note})</span>
                       )}
+                      {ingredient.tooltip && <TooltipIcon label={ingredient.tooltip} />}
                     </span>
-                    {ingredient.tooltip && <TooltipIcon label={ingredient.tooltip} />}
                   </div>
                 </div>
               );

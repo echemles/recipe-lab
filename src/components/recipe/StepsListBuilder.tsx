@@ -56,14 +56,16 @@ export function StepsListBuilder({
               <span className="text-muted font-medium w-7 pt-2 text-sm">
                 {idx + 1}.
               </span>
-              <Input
-                type="text"
-                placeholder={`Step ${idx + 1} (e.g. Preheat oven to 350°F)`}
-                className="flex-1"
-                value={step}
-                onChange={(e) => onChange(idx, e.target.value)}
-                aria-label={`Step ${idx + 1}`}
-              />
+              <div className="flex-1">
+                <Input
+                  type="text"
+                  placeholder={`Step ${idx + 1} (e.g. Preheat oven to 350°F)`}
+                  className="w-full"
+                  value={step}
+                  onChange={(e) => onChange(idx, e.target.value)}
+                  aria-label={`Step ${idx + 1}`}
+                />
+              </div>
               <Button
                 type="button"
                 variant="ghost"

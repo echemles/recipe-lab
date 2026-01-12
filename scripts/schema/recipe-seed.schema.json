@@ -89,6 +89,53 @@
       },
       "required": ["quantity", "unit", "name"]
     },
+    "macros": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "calories": {
+          "type": "number",
+          "minimum": 0
+        },
+        "protein": {
+          "type": "number",
+          "minimum": 0
+        },
+        "carbohydrates": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fat": {
+          "type": "number",
+          "minimum": 0
+        },
+        "fiber": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sugar": {
+          "type": "number",
+          "minimum": 0
+        },
+        "sodium": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cholesterol": {
+          "type": "number",
+          "minimum": 0
+        },
+        "saturatedFat": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unsaturatedFat": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": ["calories", "protein", "carbohydrates", "fat"]
+    },
     "recipe": {
       "type": "object",
       "additionalProperties": false,
@@ -148,6 +195,9 @@
         "updatedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "macros": {
+          "$ref": "#/definitions/macros"
         },
         "images": {
           "type": "array",

@@ -28,6 +28,19 @@
   --radius-lg: var(--radius-card);
   --radius-xl: var(--radius-panel);
   
+  /* Spacing Scale */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-12: 3rem;    /* 48px */
+  
+  /* Component-specific spacing */
+  --space-card: var(--space-6);
+  --space-modal: var(--space-8);
+  
   /* Depth - Reduced Shadow Emphasis */
   --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.03);
   --shadow-2: 0 2px 8px 0 rgb(0 0 0 / 0.06);
@@ -118,7 +131,7 @@ body {
   margin-right: calc(50% - 50vw);
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 767px) {
   .landing-page {
     gap: 0;
   }
@@ -153,6 +166,33 @@ body {
 
   .landing-divider svg {
     opacity: 0.6;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  :where(html, body):has(.landing-page) {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 0;
+  }
+
+  .landing-section {
+    min-height: 100vh;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .landing-section.hero-section {
+    padding-top: var(--landing-header-height);
+  }
+
+  .landing-divider {
+    scroll-snap-align: none;
+    min-height: auto;
+  }
+
+  .landing-footer {
+    scroll-snap-align: end;
+    scroll-snap-stop: always;
   }
 }
 
@@ -320,6 +360,36 @@ body {
   animation: aiLoadingEmojiFloat 3.2s ease-in-out infinite;
 }
 
+.glow-filament {
+  position: relative;
+  animation-name: filamentGlow;
+  animation-duration: var(--glow-duration, 2.8s);
+  animation-delay: var(--glow-delay, 0s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  text-shadow: 0 0 12px hsl(var(--accent) / 0.55);
+}
+
+@keyframes filamentGlow {
+  0% {
+    text-shadow: 0 0 6px hsl(var(--accent) / 0.2), 0 0 18px hsl(var(--accent) / 0.35);
+    filter: brightness(1);
+  }
+  45% {
+    text-shadow: 0 0 12px hsl(var(--accent) / 0.35), 0 0 26px hsl(var(--accent) / 0.55), 0 0 48px hsl(var(--accent) / 0.4);
+    filter: brightness(1.08);
+  }
+  60% {
+    text-shadow: 0 0 22px hsl(var(--accent) / 0.55), 0 0 42px hsl(var(--accent) / 0.7), 0 0 64px hsl(var(--accent) / 0.6);
+    filter: brightness(1.12);
+  }
+  100% {
+    text-shadow: 0 0 8px hsl(var(--accent) / 0.25), 0 0 20px hsl(var(--accent) / 0.45);
+    filter: brightness(1.02);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .recipe-card-animate {
     animation: none;
@@ -359,13 +429,13 @@ h1 {
   font-variation-settings: "opsz" 64, "slnt" 0, "GRAD" 0, "wght" 620;
 }
 h2 { 
-  font-weight: 580;
-  letter-spacing: -0.03em;
+  font-weight: normal;
+  letter-spacing: 0;
   font-variation-settings: "opsz" 48, "slnt" 0, "GRAD" 0, "wght" 580;
 }
 h3 { 
-  font-weight: 570;
-  letter-spacing: 0.1rem;
+  font-weight: normal;
+  letter-spacing: 0;
   font-variation-settings: "opsz" 32, "slnt" 0, "GRAD" 0, "wght" 570;
 }
 
@@ -407,4 +477,19 @@ code, pre {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Custom Checkbox Styling for Accent Color */
+input[type="checkbox"] {
+  accent-color: hsl(var(--accent));
+}
+
+input[type="checkbox"]:checked {
+  background-color: hsl(var(--accent));
+  border-color: hsl(var(--accent));
+}
+
+input[type="checkbox"]:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
 }

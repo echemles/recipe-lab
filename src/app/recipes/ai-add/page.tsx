@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from "react";
 import { Recipe } from "@/types/recipe";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
+import { Modal } from "@/components/ui/Modal";
 
 type CreatedRecipeResponse = {
   recipe: Recipe;
@@ -27,13 +27,78 @@ function getRandomLoadingMessage() {
   return LOADING_MESSAGES[Math.floor(Math.random() * LOADING_MESSAGES.length)];
 }
 
+const COOKING_MODES = {
+  beginner: {
+    title: "Beginner Friendly",
+    description: "Simple steps, familiar ingredients, minimal techniques",
+    icon: "🌱",
+    defaultIntensity: 2,
+    baseConstraints: {
+      techniqueComplexity: "very low",
+      allowedVariations: "none",
+      specialtyIngredients: false,
+      guidanceLevel: "very high"
+    }
+  },
+  traditional: {
+    title: "Traditional & Authentic",
+    description: "Classic methods and ingredients, cooked the proper way",
+    icon: "👨‍🍳",
+    defaultIntensity: 3,
+    baseConstraints: {
+      techniqueComplexity: "medium",
+      allowedVariations: "limited",
+      specialtyIngredients: false,
+      guidanceLevel: "high"
+    }
+  },
+  weeknight: {
+    title: "Weeknight Quick",
+    description: "Efficient techniques for faster, everyday cooking",
+    icon: "⚡",
+    defaultIntensity: 3,
+    baseConstraints: {
+      techniqueComplexity: "low-medium",
+      allowedVariations: "limited",
+      specialtyIngredients: false,
+      guidanceLevel: "medium"
+    }
+  },
+  chef: {
+    title: "Chef Mode",
+    description: "Layered flavors and more advanced techniques",
+    icon: "🎯",
+    defaultIntensity: 4,
+    baseConstraints: {
+      techniqueComplexity: "high",
+      allowedVariations: "moderate",
+      specialtyIngredients: true,
+      guidanceLevel: "medium"
+    }
+  },
+  experimental: {
+    title: "Experimental",
+    description: "Creative variations, bold ideas, and less conventional choices",
+    icon: "🔬",
+    defaultIntensity: 3,
+    baseConstraints: {
+      techniqueComplexity: "variable",
+      allowedVariations: "high",
+      specialtyIngredients: true,
+      guidanceLevel: "low"
+    }
+  }
+} as const;
+
+type CookingMode = keyof typeof COOKING_MODES;
+
 export default function AiAddRecipePage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [pantryInput, setPantryInput] = useState("");
   const [pantryItems, setPantryItems] = useState<string[]>([]);
-  const [palateLevel, setPalateLevel] = useState(5);
+  const [cookingMode, setCookingMode] = useState<CookingMode>("beginner");
   const [highProtein, setHighProtein] = useState(false);
   const [quickMeal, setQuickMeal] = useState(false);
   const [lowCalorie, setLowCalorie] = useState(false);
@@ -46,32 +111,26 @@ export default function AiAddRecipePage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [createdRecipe, setCreatedRecipe] = useState<Recipe | null>(null);
+  
+  // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalState, setModalState] = useState<"idle" | "loading" | "preview" | "error" | "redirecting">("idle");
-  const [loadingMessage, setLoadingMessage] = useState(getRandomLoadingMessage());
-  const [generatedRecipe, setGeneratedRecipe] = useState<RecipeDraft | null>(null);
+  const [modalState, setModalState] = useState<'loading' | 'error'>('loading');
+  const [loadingMessage, setLoadingMessage] = useState("");
   const [modalError, setModalError] = useState("");
-  const [redirectingRecipe, setRedirectingRecipe] = useState<Recipe | null>(null);
-  const [redirectTitle, setRedirectTitle] = useState("");
-  const redirectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const canCloseModal = modalState !== "redirecting";
-  const showPreview = modalState === "preview" && generatedRecipe;
-  const isRedirecting = modalState === "redirecting";
 
-  useEffect(() => {
-    return () => {
-      if (redirectTimeoutRef.current) {
-        clearTimeout(redirectTimeoutRef.current);
-      }
-    };
-  }, []);
 
   function handleAddPantryItem() {
     const trimmed = pantryInput.trim();
-    if (trimmed && !pantryItems.includes(trimmed)) {
-      setPantryItems([...pantryItems, trimmed]);
-      setPantryInput("");
+    if (!trimmed) return;
+    
+    // Split by comma and process each item
+    const items = trimmed.split(',').map(item => item.trim()).filter(item => item);
+    const newItems = items.filter(item => !pantryItems.includes(item));
+    
+    if (newItems.length > 0) {
+      setPantryItems([...pantryItems, ...newItems]);
     }
+    setPantryInput("");
   }
 
   function handleRemovePantryItem(item: string) {
@@ -85,12 +144,43 @@ export default function AiAddRecipePage() {
     }
   }
 
+  function handlePantryBlur() {
+    handleAddPantryItem();
+  }
+
+  function handleCookingModeChange(mode: CookingMode) {
+    setCookingMode(mode);
+  }
+
+  function handleCookingModeKeyDown(e: React.KeyboardEvent, currentMode: CookingMode) {
+    const modes = Object.keys(COOKING_MODES) as CookingMode[];
+    const currentIndex = modes.indexOf(currentMode);
+    
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        e.preventDefault();
+        const nextIndex = (currentIndex + 1) % modes.length;
+        setCookingMode(modes[nextIndex]);
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        e.preventDefault();
+        const prevIndex = (currentIndex - 1 + modes.length) % modes.length;
+        setCookingMode(modes[prevIndex]);
+        break;
+    }
+  }
+
   function buildGenerationPayload() {
+    const selectedMode = COOKING_MODES[cookingMode];
+    
     return {
       title: title.trim() || undefined,
       description: description.trim() || undefined,
       pantryItems,
-      palateLevel,
+      cookingMode,
+      constraints: selectedMode.baseConstraints,
       preferences: {
         highProtein,
         quickMeal,
@@ -105,29 +195,47 @@ export default function AiAddRecipePage() {
   }
 
   async function generateRecipeFromInputs() {
-    setSubmitting(true);
+    const payload = buildGenerationPayload();
+    console.log("Generating recipe with payload:", payload);
+    
+    // Open modal with loading state
     setIsModalOpen(true);
-    setModalState("loading");
+    setModalState('loading');
     setLoadingMessage(getRandomLoadingMessage());
     setModalError("");
+    
+    setSubmitting(true);
+    setError("");
 
     try {
       const response = await fetch("/api/recipes/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(buildGenerationPayload()),
+        body: JSON.stringify(payload),
       });
 
+      console.log("Response status:", response.status);
       const data = await response.json().catch(() => ({}));
+      console.log("Response data:", data);
+      
       if (!response.ok) {
         throw new Error(data?.message ?? "Unable to generate recipe.");
       }
 
-      setGeneratedRecipe(data.recipe as RecipeDraft);
-      setModalState("preview");
+      const recipe = data as RecipeDraft;
+      console.log("Generated recipe:", recipe);
+      
+      // Redirect to AI preview page with recipe data
+      const recipeData = encodeURIComponent(JSON.stringify(recipe));
+      console.log("AI add page - redirecting with data:", recipeData.substring(0, 200) + "...");
+      router.push(`/recipes/ai-preview?recipe=${recipeData}`);
+      
     } catch (err) {
-      setModalState("error");
-      setModalError(err instanceof Error ? err.message : "Failed to generate recipe.");
+      console.error("Generation error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to generate recipe.";
+      setModalError(errorMessage);
+      setModalState('error');
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -135,11 +243,22 @@ export default function AiAddRecipePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    console.log("Form submitted", { description, pantryItems });
     setError("");
     setSuccessMessage("");
     setCreatedRecipe(null);
-    setGeneratedRecipe(null);
-    setModalError("");
+
+    // Add any remaining pantry input text before submission
+    const trimmed = pantryInput.trim();
+    if (trimmed) {
+      // Split by comma and process each item
+      const items = trimmed.split(',').map(item => item.trim()).filter(item => item);
+      const newItems = items.filter(item => !pantryItems.includes(item));
+      if (newItems.length > 0) {
+        setPantryItems([...pantryItems, ...newItems]);
+      }
+      setPantryInput("");
+    }
 
     if (!description.trim() && pantryItems.length === 0) {
       setError("Provide a recipe description or at least one pantry item.");
@@ -149,67 +268,17 @@ export default function AiAddRecipePage() {
     await generateRecipeFromInputs();
   }
 
-  async function handleRetryGenerate() {
-    setModalState("loading");
-    setLoadingMessage(getRandomLoadingMessage());
-    await generateRecipeFromInputs();
-  }
-
-  async function handleSaveGeneratedRecipe() {
-    if (!generatedRecipe) return;
-    setRedirectTitle(generatedRecipe.title ?? "your recipe");
-    setModalState("redirecting");
-    setModalError("");
-    setRedirectingRecipe(null);
-
-    try {
-      const response = await fetch("/api/recipes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(generatedRecipe),
-      });
-
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data?.message ?? "Unable to save recipe.");
-      }
-
-      const createdRecipe = data as Recipe;
-      setCreatedRecipe(createdRecipe);
-      setRedirectingRecipe(createdRecipe);
-      setRedirectTitle(createdRecipe.title);
-      setGeneratedRecipe(null);
-      setLoadingMessage(getRandomLoadingMessage());
-      setTitle("");
-      setDescription("");
-      setPantryItems([]);
-      setPalateLevel(5);
-      setHighProtein(false);
-      setQuickMeal(false);
-      setLowCalorie(false);
-      setMealPrepFriendly(false);
-      setLowCost(false);
-      setBudgetFriendly(false);
-      setLowCarb(false);
-      setGlutenFree(false);
-      redirectTimeoutRef.current = setTimeout(() => {
-        router.push(`/recipe/${createdRecipe.id}`);
-      }, 900);
-    } catch (err) {
-      setRedirectTitle("");
-      setModalState("error");
-      setModalError(err instanceof Error ? err.message : "Failed to save recipe.");
-    }
-  }
-
   function handleCloseModal() {
     setIsModalOpen(false);
-    setModalState("idle");
-    setGeneratedRecipe(null);
+    setModalState('loading');
+    setLoadingMessage("");
     setModalError("");
-    setRedirectTitle("");
-    setLoadingMessage(getRandomLoadingMessage());
   }
+
+  function handleRetryGenerate() {
+    generateRecipeFromInputs();
+  }
+
 
   return (
     <main className="flex min-h-screen flex-col items-center py-16">
@@ -299,6 +368,7 @@ export default function AiAddRecipePage() {
                   value={pantryInput}
                   onChange={(e) => setPantryInput(e.target.value)}
                   onKeyDown={handlePantryKeyDown}
+                  onBlur={handlePantryBlur}
                 />
                 <Button
                   type="button"
@@ -321,7 +391,7 @@ export default function AiAddRecipePage() {
                     <button
                       type="button"
                       onClick={() => handleRemovePantryItem(item)}
-                      className="hover:text-red-600 transition-colors"
+                      className="hover:text-red-600 transition-colors cursor-pointer"
                       aria-label="Remove item"
                     >
                       ✕
@@ -342,25 +412,38 @@ export default function AiAddRecipePage() {
 
             <div>
               <label className="block text-sm font-medium mb-2 tracking-[0.005em]">
-                Flavor Complexity: <span className="font-semibold text-accent">{palateLevel <= 3 ? 'Mild & Familiar' : palateLevel <= 7 ? 'Moderate' : 'Bold & Adventurous'}</span>
+                Cooking Mode
               </label>
-              <p className="text-xs text-muted mb-3">
-                {palateLevel <= 3 && "Classic flavors and common ingredients"}
-                {palateLevel > 3 && palateLevel <= 7 && "Balanced flavors with some variety"}
-                {palateLevel > 7 && "Unique combinations and bold seasonings"}
+              <p className="text-xs text-muted mb-4">
+                Choose how the recipe should be structured and guided.
               </p>
-              <input
-                type="range"
-                min="1"
-                max="10"
-                value={palateLevel}
-                onChange={(e) => setPalateLevel(Number(e.target.value))}
-                className="w-full h-2 bg-surface-2 rounded-[--radius-input] appearance-none cursor-pointer accent-accent"
-              />
-              <div className="flex justify-between text-xs text-muted mt-1">
-                <span>Mild</span>
-                <span className="font-medium">{palateLevel}</span>
-                <span>Adventurous</span>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" role="radiogroup">
+                {Object.entries(COOKING_MODES).map(([key, mode]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => handleCookingModeChange(key as CookingMode)}
+                    onKeyDown={(e) => handleCookingModeKeyDown(e, key as CookingMode)}
+                    className={`
+                      p-4 rounded-lg border-2 transition-all duration-200 text-left cursor-pointer
+                      ${cookingMode === key 
+                        ? 'border-accent bg-accent/10 shadow-md transform scale-[1.03]' 
+                        : 'border-border bg-surface-1/50 hover:bg-surface-2 hover:border-accent/50 hover:shadow-md hover:transform hover:scale-[1.02] hover:-translate-y-1'
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-accent/30 focus:ring-offset-2
+                    `}
+                    role="radio"
+                    aria-checked={cookingMode === key}
+                    tabIndex={0}
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-2xl">{mode.icon}</span>
+                      <div className="font-medium text-sm">{mode.title}</div>
+                    </div>
+                    <div className="text-xs text-muted leading-relaxed">{mode.description}</div>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -374,7 +457,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={highProtein}
                     onChange={(e) => setHighProtein(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">High Protein</span>
                 </label>
@@ -383,7 +466,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={quickMeal}
                     onChange={(e) => setQuickMeal(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Quick Meal (≤30 min)</span>
                 </label>
@@ -392,7 +475,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={lowCarb}
                     onChange={(e) => setLowCarb(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Low-Carb</span>
                 </label>
@@ -401,7 +484,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={glutenFree}
                     onChange={(e) => setGlutenFree(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Gluten-Free</span>
                 </label>
@@ -410,7 +493,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={lowCalorie}
                     onChange={(e) => setLowCalorie(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Low Calorie</span>
                 </label>
@@ -419,7 +502,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={mealPrepFriendly}
                     onChange={(e) => setMealPrepFriendly(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Meal-Prep Friendly</span>
                 </label>
@@ -428,7 +511,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={lowCost}
                     onChange={(e) => setLowCost(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent"
+                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
                   />
                   <span className="text-sm">Low Cost</span>
                 </label>
@@ -527,173 +610,46 @@ export default function AiAddRecipePage() {
           </Card>
         )}
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => {
-              if (canCloseModal) handleCloseModal();
-            }}
-          />
-          <motion.div
-            initial={{ scale: 0.9 }}
-            animate={{
-              scale: modalState === "redirecting" ? 0.85 : 1,
-              maxWidth: modalState === "redirecting" ? 360 : 768,
-            }}
-            transition={{ type: "spring", stiffness: 220, damping: 26 }}
-            className="relative z-10 w-full p-0 overflow-hidden"
-          >
-            <Card className="w-full h-full">
-              {modalState === "loading" && (
-                <div className="bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)] p-12">
-                  <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">
-                    <div className="relative flex items-center justify-center">
-                      <div className="ai-loading-halo absolute inset-0 rounded-full bg-gradient-to-br from-white/50 via-white/5 to-transparent blur-3xl dark:from-white/10 dark:via-white/5 dark:to-transparent" />
-                      <div className="relative flex size-28 items-center justify-center rounded-full border border-white/60 bg-white/80 shadow-[0_25px_80px_rgba(12,16,35,0.25)] backdrop-blur-3xl dark:border-white/10 dark:bg-white/5">
-                        <span className="ai-loading-emoji text-5xl" role="img" aria-label="Apple inspired chef">
-                          🍏
-                        </span>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <p className="text-[0.65rem] uppercase tracking-[0.55em] text-muted">AI Mise en Place</p>
-                      <p className="text-3xl font-semibold leading-snug">{loadingMessage}</p>
-                      <p className="text-sm text-muted max-w-xs mx-auto">
-                        A quiet pause while our culinary model balances acid, heat, and rhythm just for you.
-                      </p>
-                    </div>
-                    <div className="h-px w-28 bg-gradient-to-r from-transparent via-accent/60 to-transparent" />
-                    <p className="text-xs uppercase tracking-[0.35em] text-muted">Almost ready</p>
-                  </div>
-                </div>
-              )}
-            {modalState === "error" && (
-              <div className="p-8 space-y-6">
-                <div className="flex items-center gap-3 text-red-600">
-                  <span className="text-3xl">⚠️</span>
-                  <div>
-                    <h3 className="text-xl font-semibold">Something burnt the soufflé</h3>
-                    <p className="text-sm text-muted">{modalError}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col sm:flex-row justify-end gap-3">
-                  <Button variant="secondary" onClick={handleRetryGenerate} disabled={submitting}>
-                    Try Again
-                  </Button>
-                  <Button variant="ghost" onClick={handleCloseModal}>
-                    Close
-                  </Button>
-                </div>
-              </div>
-            )}
-            {showPreview && (
-              <div className="p-8 space-y-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-sm uppercase tracking-[0.3em] text-muted">Preview Recipe</p>
-                    <h2 className="text-3xl font-bold mt-2">{generatedRecipe.title}</h2>
-                    <p className="text-muted mt-3">{generatedRecipe.description}</p>
-                  </div>
-                  <button
-                    className="text-muted hover:text-text"
-                    onClick={handleCloseModal}
-                    disabled={!canCloseModal}
-                    aria-label="Close preview"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="grid gap-6 md:grid-cols-2">
-                  <div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">Ingredients</h3>
-                    <ul className="mt-3 space-y-2 text-sm">
-                      {generatedRecipe.ingredients.map((ingredient, idx) => (
-                        <li key={`${ingredient.name}-${idx}`} className="flex items-start gap-2">
-                          <span className="text-accent mt-1">•</span>
-                          <span>
-                            {ingredient.quantity ? `${ingredient.quantity} ` : ""}
-                            {ingredient.unit ? `${ingredient.unit} ` : ""}
-                            {ingredient.name}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-muted">Steps</h3>
-                    <ol className="mt-3 list-decimal pl-5 space-y-2 text-sm">
-                      {generatedRecipe.steps.map((step, idx) => (
-                        <li key={idx}>{step}</li>
-                      ))}
-                    </ol>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-3 text-xs uppercase tracking-wide text-muted">
-                  {generatedRecipe.prepTimeMinutes && (
-                    <span className="rounded-full border border-border px-4 py-1">
-                      Prep {generatedRecipe.prepTimeMinutes} min
-                    </span>
-                  )}
-                  {typeof generatedRecipe.cookTimeMinutes === "number" && (
-                    <span className="rounded-full border border-border px-4 py-1">
-                      {generatedRecipe.cookTimeMinutes === 0
-                        ? "No cook time"
-                        : `Cook ${generatedRecipe.cookTimeMinutes} min`}
-                    </span>
-                  )}
-                  {generatedRecipe.servings && (
-                    <span className="rounded-full border border-border px-4 py-1">
-                      Serves {generatedRecipe.servings}
-                    </span>
-                  )}
-                  {(generatedRecipe.tags ?? []).map((tag) => (
-                    <span key={tag} className="rounded-full border border-border px-4 py-1">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 border-t border-border/50">
-                  <Button variant="ghost" onClick={handleCloseModal} disabled={!canCloseModal}>
-                    Dismiss
-                  </Button>
-                  <Button onClick={handleSaveGeneratedRecipe} disabled={isRedirecting}>
-                    {isRedirecting ? "Saving…" : "Save to Recipes"}
-                  </Button>
-                </div>
-              </div>
-            )}
-            {modalState === "redirecting" && (
-              <div className="p-10 text-center space-y-5 bg-[var(--bg-ai-light)] dark:bg-[var(--bg-ai-dark)]">
-                <div className="flex items-center justify-center gap-3 text-4xl">
-                  <motion.span
-                    animate={{ rotate: [0, 10, -10, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.2 }}
-                  >
-                    🚀
-                  </motion.span>
-                  <motion.span
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ repeat: Infinity, duration: 1 }}
-                  >
-                    🍽️
-                  </motion.span>
-                </div>
-                <p className="text-sm uppercase tracking-[0.3em] text-muted">
-                  Redirecting
-                </p>
-                <p className="text-2xl font-semibold">
-                  Opening {redirectingRecipe?.title ?? redirectTitle}
-                </p>
-                <p className="text-muted text-sm max-w-sm mx-auto">
-                  We saved your recipe and we’re taking you to the full details now.
-                </p>
-              </div>
-            )}
-            </Card>
-          </motion.div>
-        </div>
-      )}
+
+      {/* Recipe Generation Modal */}
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} size="lg" ariaLabel="Recipe Generation">
+        {modalState === 'loading' && (
+          <div className="text-center py-6 sm:py-8">
+            <div className="mb-6">
+              <video 
+                autoPlay 
+                loop 
+                muted 
+                playsInline
+                className="w-24 h-24 mx-auto mb-4 rounded-lg dark:invert dark:hue-rotate-180"
+              >
+                <source src="/food-animation.webm" type="video/webm" />
+                Your browser does not support the video tag.
+              </video>
+              <h2 className="text-xl font-semibold mb-2">Generating Your Recipe</h2>
+              <p className="text-muted">{loadingMessage}</p>
+            </div>
+          </div>
+        )}
+
+        {modalState === 'error' && (
+          <div className="text-center py-6 sm:py-8">
+            <div className="mb-4 sm:mb-6">
+              <span className="text-3xl sm:text-4xl">⚠️</span>
+            </div>
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">Generation Error</h2>
+            <p className="text-muted mb-4 sm:mb-6 text-sm sm:text-base">{modalError || "Failed to generate recipe. Please try again."}</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={handleRetryGenerate} variant="primary">
+                Try Again
+              </Button>
+              <Button onClick={handleCloseModal} variant="secondary">
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </main>
   );
 }

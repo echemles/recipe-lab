@@ -97,7 +97,7 @@ export function AssembleDemoSection() {
 
   useEffect(() => {
     if (!isComplete || prefersReducedMotion || hasAutoScrolled.current) return;
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches) {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 1024px)").matches) {
       mealCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       hasAutoScrolled.current = true;
     }

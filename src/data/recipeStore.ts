@@ -43,11 +43,19 @@ export async function getAllRecipes(): Promise<Recipe[]> {
     const count = await collection.countDocuments();
     console.log(`[playwright-test] Recipes found: ${count}`);
   }
-  const docs = await collection.find({}).sort({ createdAt: -1 }).toArray();
+  const docs = await collection.find({ isDraft: { $ne: true } }).sort({ createdAt: -1 }).toArray();
   return docs.map(mapDocument);
 }
 
 export async function getRecipeById(id: string): Promise<Recipe | null> {
+  const objectId = toObjectId(id);
+  if (!objectId) return null;
+  const collection = await getCollection();
+  const doc = await collection.findOne({ _id: objectId });
+  return doc ? mapDocument(doc) : null;
+}
+
+export async function getAnyRecipeById(id: string): Promise<Recipe | null> {
   const objectId = toObjectId(id);
   if (!objectId) return null;
   const collection = await getCollection();

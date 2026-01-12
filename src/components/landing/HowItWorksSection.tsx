@@ -66,7 +66,7 @@ export function HowItWorksSection() {
               }}
               className="border border-border/20 rounded-2xl p-6 sm:p-8 relative backdrop-blur-sm bg-surface-1/30 hover:bg-surface-1/50 hover:border-border/40 transition-colors hover:shadow-2xl hover:shadow-accent/5"
             >
-              <StepIcon step={step.number} />
+              <StepIcon step={step.number} isInView={isInView} />
               <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
               <p className="text-muted leading-relaxed">{step.description}</p>
               {step.number === 1 && step.examples && (

@@ -155,9 +155,9 @@ export function SearchableRecipesList({ recipes }: SearchableRecipesListProps) {
                     </div>
 
                     <div className="flex-grow flex flex-col">
-                      <h2 className="text-xl font-semibold mb-2 line-clamp-2">
+                      <h3 className="text-xl font-semibold mb-2 line-clamp-2">
                         {recipe.title}
-                      </h2>
+                      </h3>
                       <p className="text-muted text-sm line-clamp-3 flex-grow">
                         {recipe.description}
                       </p>

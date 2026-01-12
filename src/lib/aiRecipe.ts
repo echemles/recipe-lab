@@ -7,7 +7,13 @@ export type AIRecipeDraftInput = {
   title?: string;
   description?: string;
   pantryItems?: string[];
-  palateLevel?: number;
+  cookingMode?: "beginner" | "traditional" | "weeknight" | "chef" | "experimental";
+  constraints?: {
+    techniqueComplexity: string;
+    allowedVariations: string;
+    specialtyIngredients: boolean;
+    guidanceLevel: string;
+  };
   preferences?: {
     highProtein?: boolean;
     quickMeal?: boolean;
@@ -24,7 +30,8 @@ export async function generateRecipeDraft({
   title,
   description,
   pantryItems = [],
-  palateLevel = 5,
+  cookingMode = "beginner",
+  constraints,
   preferences = {},
 }: AIRecipeDraftInput): Promise<RecipeInput> {
   const sanitizedTitle = title?.trim();
@@ -42,7 +49,8 @@ export async function generateRecipeDraft({
     sanitizedTitle,
     sanitizedDescription,
     sanitizedPantry,
-    palateLevel,
+    cookingMode,
+    constraints,
     preferences
   );
 
@@ -103,7 +111,8 @@ function buildUserPrompt(
   title?: string,
   description?: string,
   pantryItems: string[] = [],
-  palateLevel: number = 5,
+  cookingMode: "beginner" | "traditional" | "weeknight" | "chef" | "experimental" = "beginner",
+  constraints?: AIRecipeDraftInput["constraints"],
   preferences: AIRecipeDraftInput["preferences"] = {}
 ): string {
   const parts: string[] = [];
@@ -122,7 +131,14 @@ function buildUserPrompt(
     parts.push(`Use these pantry items: ${pantryItems.join(", ")}`);
   }
 
-  parts.push(`Palate level: ${palateLevel}/10 (1=mild, 10=adventurous)`);
+  // Add cooking mode constraints
+  if (constraints) {
+    parts.push(`Cooking mode: ${cookingMode}`);
+    parts.push(`Technique complexity: ${constraints.techniqueComplexity}`);
+    parts.push(`Allowed variations: ${constraints.allowedVariations}`);
+    parts.push(`Specialty ingredients: ${constraints.specialtyIngredients ? 'allowed' : 'not allowed'}`);
+    parts.push(`Guidance level: ${constraints.guidanceLevel}`);
+  }
 
   const dietaryNeeds: string[] = [];
   if (preferences.highProtein) dietaryNeeds.push("high protein");

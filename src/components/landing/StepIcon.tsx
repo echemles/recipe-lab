@@ -4,9 +4,10 @@ import { motion } from "framer-motion";
 
 interface StepIconProps {
   step: 1 | 2 | 3;
+  isInView?: boolean;
 }
 
-export function StepIcon({ step }: StepIconProps) {
+export function StepIcon({ step, isInView = false }: StepIconProps) {
   const icons = {
     1: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
@@ -17,7 +18,7 @@ export function StepIcon({ step }: StepIconProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 1.2, ease: "easeInOut", delay: 0.3 }}
         />
         <motion.path
@@ -27,7 +28,7 @@ export function StepIcon({ step }: StepIconProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut", delay: 0.8 }}
         />
       </svg>
@@ -41,7 +42,7 @@ export function StepIcon({ step }: StepIconProps) {
           stroke="currentColor"
           strokeWidth="1.5"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 1.2, ease: "easeInOut", delay: 0.3 }}
         />
         <motion.path
@@ -51,7 +52,7 @@ export function StepIcon({ step }: StepIconProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut", delay: 0.9 }}
         />
       </svg>
@@ -65,7 +66,7 @@ export function StepIcon({ step }: StepIconProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 1.4, ease: "easeInOut", delay: 0.3 }}
         />
         <motion.path
@@ -75,7 +76,7 @@ export function StepIcon({ step }: StepIconProps) {
           strokeLinecap="round"
           strokeLinejoin="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 1 }}
+          animate={isInView ? { pathLength: 1, opacity: 1 } : { pathLength: 0, opacity: 0 }}
           transition={{ duration: 1, ease: "easeInOut", delay: 1 }}
         />
       </svg>

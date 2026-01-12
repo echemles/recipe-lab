@@ -64,22 +64,26 @@ export function HeroSection() {
             </Link>
           </motion.div>
 
-          <motion.button
+          <motion.div
             variants={heroSubcopyVariants}
             initial="hidden"
             animate="visible"
-            whileHover={{ scale: 1.02, backgroundColor: "rgba(var(--surface-2), 0.5)" }}
+            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             transition={{ ...transitionPresets.spring }}
-            onClick={() => {
-              document.getElementById("how-it-works")?.scrollIntoView({
-                behavior: "smooth",
-              });
-            }}
-            className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg border border-border rounded-[--radius-button] backdrop-blur-sm bg-surface-1/30 hover:bg-surface-2/50 transition-colors w-full sm:w-auto"
           >
-            See how it works
-          </motion.button>
+            <Button 
+              variant="secondary" 
+              className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
+              onClick={() => {
+                document.getElementById("how-it-works")?.scrollIntoView({
+                  behavior: "smooth",
+                });
+              }}
+            >
+              See how it works
+            </Button>
+          </motion.div>
         </motion.div>
       </div>
     </section>
