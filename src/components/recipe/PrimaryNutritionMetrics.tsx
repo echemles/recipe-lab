@@ -6,17 +6,16 @@ import { TextLink } from "@/components/ui/TextLink";
 
 interface PrimaryNutritionMetricsProps {
   macros: MacroInformation;
-  scaleFactor?: number;
 }
 
-export function PrimaryNutritionMetrics({ macros, scaleFactor = 1 }: PrimaryNutritionMetricsProps) {
+export function PrimaryNutritionMetrics({ macros }: PrimaryNutritionMetricsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const primaryMetrics = [
-    { label: "Calories", value: Math.round(macros.calories * scaleFactor), unit: "" },
-    { label: "Protein", value: (macros.protein * scaleFactor).toFixed(1), unit: "g" },
-    { label: "Carbs", value: (macros.carbohydrates * scaleFactor).toFixed(1), unit: "g" },
-    { label: "Fat", value: (macros.fat * scaleFactor).toFixed(1), unit: "g" },
+    { label: "Calories", value: Math.round(macros.calories), unit: "" },
+    { label: "Protein", value: Math.round(macros.protein), unit: "g" },
+    { label: "Carbs", value: Math.round(macros.carbohydrates), unit: "g" },
+    { label: "Fat", value: Math.round(macros.fat), unit: "g" },
   ];
 
   const nonMacroMetrics = [
@@ -48,14 +47,6 @@ export function PrimaryNutritionMetrics({ macros, scaleFactor = 1 }: PrimaryNutr
 
       {nonMacroMetrics.length > 0 && (
         <>
-          <TextLink
-            onClick={() => setIsExpanded(!isExpanded)}
-            isExpanded={isExpanded}
-            aria-controls="non-macro-nutrition"
-          >
-            {isExpanded ? "Hide nutrition details" : "More nutrition details"}
-          </TextLink>
-          
           <div
             id="non-macro-nutrition"
             className={`overflow-hidden transition-all duration-175 ease-in-out ${
@@ -70,16 +61,21 @@ export function PrimaryNutritionMetrics({ macros, scaleFactor = 1 }: PrimaryNutr
                     {metric.label}:
                   </p>
                   <p className="text-sm font-medium">
-                    {metric.unit === "mg" 
-                      ? Math.round(metric.value! * scaleFactor)
-                      : (metric.value! * scaleFactor).toFixed(1)
-                    }
+                    {Math.round(metric.value!)}
                     <span className="text-xs text-muted ml-1">{metric.unit}</span>
                   </p>
                 </div>
               ))}
             </div>
           </div>
+          
+          <TextLink
+            onClick={() => setIsExpanded(!isExpanded)}
+            isExpanded={isExpanded}
+            aria-controls="non-macro-nutrition"
+          >
+            {isExpanded ? "Hide nutrition details" : "More nutrition details"}
+          </TextLink>
         </>
       )}
     </div>

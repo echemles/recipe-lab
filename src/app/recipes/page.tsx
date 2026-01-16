@@ -1,20 +1,54 @@
+"use client";
+
 import Link from "next/link";
-import { getAllRecipes } from "@/data/recipeStore";
 import { Button } from "@/components/ui/Button";
 import { SearchableRecipesList } from "./SearchableRecipesList";
+import { useEffect, useState } from "react";
+import { Recipe } from "@/types/recipe";
+import { fetchRecipes } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-export default async function RecipesPage() {
-  const recipes = await getAllRecipes();
-  // Shuffle recipes for random order
-  const shuffledRecipes = [...recipes].sort(() => Math.random() - 0.5);
+export default function RecipesPage() {
+  useEffect(() => {
+    // Ensure we start at the top of the page when navigating to recipes
+    window.scrollTo(0, 0);
+  }, []);
+
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadRecipes = async () => {
+      try {
+        const fetchedRecipes = await fetchRecipes();
+        setRecipes(fetchedRecipes);
+      } catch (error) {
+        console.error("Failed to load recipes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRecipes();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="recipes-listing flex min-h-screen flex-col items-center pt-24 pb-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-muted">Loading recipes...</p>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="recipes-listing flex min-h-screen flex-col items-center py-16">
+    <main className="recipes-listing flex min-h-screen flex-col items-center pt-24 pb-16">
       <div className="w-full flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2">Recipes</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2"><span className="font-caveat text-4xl sm:text-5xl">Recipes</span></h1>
           <p className="text-muted">
             Browse your saved dishes or let AI draft a new one.
           </p>
@@ -29,10 +63,24 @@ export default async function RecipesPage() {
         </div>
       </div>
 
-      {shuffledRecipes.length === 0 ? (
-        <p className="text-muted">No recipes yet.</p>
+      {recipes.length === 0 ? (
+        <div className="relative w-full flex flex-col items-center justify-center py-16">
+          {/* Watercolor illustration - empty state atmospheric element */}
+          <div 
+            className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
+            aria-hidden="true"
+          >
+            <img 
+              src="/illustrations/bag-with-bread.png" 
+              alt="" 
+              className="w-[320px] h-[400px] object-contain animate-[blur-to-final_3s_ease-out_forwards]"
+            />
+          </div>
+          <p className="text-muted text-lg relative z-10">No recipes yet.</p>
+          <p className="text-muted/70 text-sm mt-2 relative z-10">Add your first recipe to get started.</p>
+        </div>
       ) : (
-        <SearchableRecipesList recipes={shuffledRecipes} />
+        <SearchableRecipesList recipes={recipes} />
       )}
     </main>
   );

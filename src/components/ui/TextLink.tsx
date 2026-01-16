@@ -17,13 +17,13 @@ export function TextLink({
     <button
       type="button"
       className={`
-        text-xs text-green-600 dark:text-green-400 
-        hover:text-green-700 dark:hover:text-green-300 
+        text-xs text-accent dark:text-accent 
+        hover:text-accent/80 dark:hover:text-accent/80 
         transition-colors duration-150
-        underline-offset-[6px] underline decoration-green-600/50 dark:decoration-green-400/50
-        hover:decoration-green-700/70 dark:hover:decoration-green-300/70
+        underline-offset-[6px] underline decoration-accent/50 dark:decoration-accent/50
+        hover:decoration-accent/70 dark:hover:decoration-accent/70
         p-0 h-auto font-normal bg-transparent border-none cursor-pointer
-        focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-1
+        focus:outline-none focus:ring-2 focus:ring-accent/50 focus:ring-offset-1
         ${className}
       `}
       aria-expanded={isExpanded}

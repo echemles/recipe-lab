@@ -1,19 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { Recipe } from "@/types/recipe";
 import { RecipeEditor, RecipeInput } from "@/components/recipe/RecipeEditor";
 
-type EditRecipePageProps = {
-  params: {
-    recipeNumber: string;
-  };
-};
-
-export default function EditRecipePage({ params }: EditRecipePageProps) {
+export default function EditRecipePage() {
   const router = useRouter();
-  const { recipeNumber } = params;
+  const params = useParams();
+  const recipeNumber = params.recipeNumber as string;
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState(true);
@@ -95,7 +90,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center py-16">
+      <main className="flex min-h-screen flex-col items-center py-16 px-4 sm:px-0">
         <p className="text-muted">Loading recipe...</p>
       </main>
     );
@@ -103,7 +98,7 @@ export default function EditRecipePage({ params }: EditRecipePageProps) {
 
   if (error && !recipe) {
     return (
-      <main className="flex min-h-screen flex-col items-center py-16">
+      <main className="flex min-h-screen flex-col items-center py-16 px-4 sm:px-0">
         <h1 className="text-4xl font-bold mb-4">Error</h1>
         <p className="text-red-600 dark:text-red-400">{error}</p>
       </main>

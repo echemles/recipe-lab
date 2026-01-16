@@ -21,6 +21,9 @@ type GenerateRecipeRequest = {
     budgetFriendly?: boolean;
     lowCarb?: boolean;
     glutenFree?: boolean;
+    vegetarian?: boolean;
+    vegan?: boolean;
+    spicy?: boolean;
   };
 };
 

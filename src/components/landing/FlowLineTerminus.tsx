@@ -48,7 +48,7 @@ export function FlowLineTerminus({ className = "" }: FlowLineTerminusProps) {
             ? { duration: 0 }
             : { duration: 0.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }
         }
-        className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/10 border border-green-500/40 flex items-center justify-center"
+        className="w-10 h-10 rounded-full bg-gradient-to-br from-accent/20 to-accent/10 border border-accent/40 flex items-center justify-center"
       >
         <svg
           viewBox="0 0 24 24"
@@ -57,7 +57,7 @@ export function FlowLineTerminus({ className = "" }: FlowLineTerminusProps) {
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="w-5 h-5 text-green-600 dark:text-green-400"
+          className="w-5 h-5 text-accent dark:text-accent"
         >
           <path d="M12 2C6.48 2 2 6 2 10c0 2.5 1.5 5 4 6.5V22l4-3h2c5.52 0 10-4 10-9s-4.48-8-10-8z" />
           <circle cx="12" cy="10" r="3" />

@@ -2,18 +2,18 @@
 
 import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback, useEffect } from "react";
-import { GradientOrb } from "./GradientOrb";
+import { PigmentCloud } from "./PigmentCloud";
 import { fadeInVariants, fadeInUpVariants, componentTileVariants, mealCardVariants, mealSlotVariants, checkmarkVariants, completionTitleVariants, transitionPresets, delayPresets } from "./motion";
 
 interface ComponentData {
   id: string;
   label: string;
-  color: "green" | "orange" | "brown" | "red" | "cream";
+  color: "accent" | "orange" | "brown" | "red" | "cream";
 }
 
 const AVAILABLE_COMPONENTS: ComponentData[] = [
   { id: "ac1", label: "Roasted Chicken", color: "orange" },
-  { id: "ac2", label: "Garlic Rice", color: "green" },
+  { id: "ac2", label: "Garlic Rice", color: "accent" },
   { id: "ac3", label: "Charred Corn", color: "cream" },
   { id: "ac4", label: "Black Beans", color: "brown" },
   { id: "ac5", label: "Pickled Onions", color: "red" },
@@ -43,30 +43,30 @@ const getDishName = (components: ComponentData[]) => {
 };
 
 const colorClasses: Record<string, { border: string; bg: string; text: string }> = {
-  green: {
-    border: "border-green-500/60",
-    bg: "bg-green-500/15",
-    text: "text-green-700 dark:text-green-400",
+  accent: {
+    border: "border-accent/8",
+    bg: "bg-gradient-to-br from-accent-soft/70 via-accent-soft/60 to-accent-soft/50",
+    text: "text-accent dark:text-accent",
   },
   orange: {
-    border: "border-orange-500/60",
-    bg: "bg-orange-500/15",
-    text: "text-orange-700 dark:text-orange-400",
+    border: "border-accent/8",
+    bg: "bg-gradient-to-br from-accent-soft/70 via-accent-soft/60 to-accent-soft/50",
+    text: "text-accent dark:text-accent",
   },
   brown: {
-    border: "border-amber-700/60",
-    bg: "bg-amber-700/15",
-    text: "text-amber-800 dark:text-amber-400",
+    border: "border-leaf/8",
+    bg: "bg-gradient-to-br from-leaf-soft/65 via-leaf-soft/55 to-leaf-soft/45",
+    text: "text-leaf dark:text-leaf",
   },
   red: {
-    border: "border-red-500/60",
-    bg: "bg-red-500/15",
-    text: "text-red-700 dark:text-red-400",
+    border: "border-tomato/8",
+    bg: "bg-gradient-to-br from-tomato-soft/65 via-tomato-soft/55 to-tomato-soft/45",
+    text: "text-tomato dark:text-tomato",
   },
   cream: {
-    border: "border-yellow-500/60",
-    bg: "bg-yellow-500/15",
-    text: "text-yellow-800 dark:text-yellow-400",
+    border: "border-accent/3",
+    bg: "bg-gradient-to-br from-accent-soft/45 via-accent-soft/35 to-accent-soft/25",
+    text: "text-muted",
   },
 };
 
@@ -105,8 +105,8 @@ export function AssembleDemoSection() {
 
   return (
     <section ref={ref} className="landing-section py-20 md:py-32 px-6 relative overflow-hidden">
-      <GradientOrb
-        color="purple"
+      <PigmentCloud
+        color="tomato"
         size="md"
         position={{ top: "20%", left: "-10%" }}
         delay={0.2}
@@ -118,9 +118,9 @@ export function AssembleDemoSection() {
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           transition={{ ...transitionPresets.smooth }}
-          className="text-2xl sm:text-3xl md:text-5xl font-semibold mb-4 text-center"
+          className="text-2xl sm:text-3xl md:text-6xl font-semibold mb-4 text-center"
         >
-          Snap components into meals.
+          <span className="font-caveat">Snap components into meals.</span>
         </motion.h2>
 
         <motion.p
@@ -153,15 +153,16 @@ export function AssembleDemoSection() {
                   variants={componentTileVariants}
                   initial="hidden"
                   animate={isUsed ? "used" : "visible"}
-                  whileHover={!isUsed && !isComplete && !prefersReducedMotion ? { scale: 1.03, x: 4 } : undefined}
-                  whileTap={!isUsed && !isComplete ? { scale: 0.97 } : undefined}
+                  whileHover={!isUsed && !isComplete && !prefersReducedMotion ? { scale: 1.02, y: -2 } : undefined}
+                  whileTap={!isUsed && !isComplete ? { scale: 0.98 } : undefined}
                   transition={{ ...transitionPresets.spring }}
                   className={`
-                    px-5 py-3 rounded-xl border-2 font-medium text-left
-                    transition-colors cursor-pointer
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2
+                    px-5 py-3 rounded-xl font-medium text-left
+                    transition-all cursor-pointer
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/20 focus-visible:ring-offset-2
                     disabled:cursor-not-allowed
                     ${colors.border} ${colors.bg} ${colors.text}
+                    hover:shadow-soft hover:from-white/15 hover:to-white/8
                   `}
                   aria-pressed={isUsed}
                   aria-label={`Add ${component.label} to meal${isUsed ? " (already added)" : ""}`}
@@ -174,12 +175,13 @@ export function AssembleDemoSection() {
 
           <div className="flex items-center" aria-hidden="true">
             <motion.svg
-              className="w-8 h-8 text-muted md:rotate-0 rotate-90"
+              className="w-8 h-8 text-muted/40 md:rotate-0 rotate-90"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              animate={{ x: [0, 4, 0], y: [0, 4, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              strokeWidth={1}
+              animate={{ x: [0, 1, 0], y: [0, 1, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </motion.svg>
@@ -187,11 +189,11 @@ export function AssembleDemoSection() {
 
           <motion.div
             className={`
-              relative w-full max-w-xs sm:w-64 border-2 rounded-2xl p-5 sm:p-6
-              backdrop-blur-sm transition-all duration-300
+              relative w-full max-w-xs sm:w-64 rounded-2xl p-5 sm:p-6
+              transition-all duration-500
               ${isComplete
-                ? "border-green-500/60 bg-green-500/5 shadow-lg shadow-green-500/10"
-                : "border-dashed border-border/40 bg-surface-1/30"
+                ? "bg-gradient-to-br from-surface-1/95 via-surface-1 to-surface-2/25 shadow-soft"
+                : "bg-gradient-to-br from-surface-1/98 via-surface-1 to-surface-2/15"
               }
             `}
             ref={mealCardRef}
@@ -210,7 +212,7 @@ export function AssembleDemoSection() {
                     initial="hidden"
                     animate="visible"
                     transition={{ ...transitionPresets.gentle }}
-                    className="text-base sm:text-lg font-semibold text-green-700 dark:text-green-400"
+                    className="text-base sm:text-lg font-semibold text-accent dark:text-accent"
                   >
                     {selectedDishName}
                   </motion.h4>
@@ -235,11 +237,11 @@ export function AssembleDemoSection() {
                   <div
                     key={index}
                     className={`
-                      h-9 sm:h-10 rounded-lg border flex items-center justify-center text-xs sm:text-sm font-medium px-2
-                      transition-all duration-200
+                      h-9 sm:h-10 rounded-lg flex items-center justify-center text-xs sm:text-sm font-medium px-2
+                      transition-all duration-400
                       ${component
-                        ? `${colors?.border} ${colors?.bg} ${colors?.text}`
-                        : "border-dashed border-border/40 text-muted/50"
+                        ? `${colors?.bg} ${colors?.text} shadow-soft-inner`
+                        : "bg-gradient-to-br from-surface-2/25 to-surface-2/15 text-muted/35"
                       }
                     `}
                   >
@@ -270,7 +272,7 @@ export function AssembleDemoSection() {
                 initial="hidden"
                 animate="visible"
                 transition={{ delay: delayPresets.short, ...transitionPresets.spring }}
-                className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-accent/85 to-accent/75 rounded-full flex items-center justify-center shadow-soft"
               >
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

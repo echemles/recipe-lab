@@ -2,21 +2,28 @@
 
 /* Design Tokens - Light Theme (default) */
 :root {
-  /* Surfaces */
-  --bg: 220 13% 97%;
-  --surface-1: 0 0% 100%;
-  --surface-2: 220 13% 95%;
+  /* Neutrals (paper / linen) */
+  --bg: 38 18% 97%;
+  --surface-1: 38 15% 99%;
+  --surface-2: 36 14% 95%;
   
   /* Text */
-  --text: 222 47% 11%;
-  --muted: 215 16% 47%;
+  --text: 28 18% 14%;
+  --muted: 30 10% 50%;
   
   /* UI */
-  --border: 220 13% 87%;
+  --border: 34 10% 88%;
   
-  /* Brand */
-  --accent: 142 76% 36%;
+  /* Primary Accent (Heat / CTA) */
+  --accent: 28 85% 50%;
+  --accent-soft: 28 85% 50% / 0.18;
   --accent-foreground: 0 0% 100%;
+  
+  /* Food Personality Accents (NON-CTA) */
+  --tomato: 6 65% 52%;
+  --tomato-soft: 6 65% 52% / 0.16;
+  --leaf: 120 22% 42%;
+  --leaf-soft: 120 22% 42% / 0.14;
   
   /* Shape - Normalized Border Radius */
   --radius-input: 0.625rem;   /* 10px - inputs/chips */
@@ -45,28 +52,34 @@
   --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.03);
   --shadow-2: 0 2px 8px 0 rgb(0 0 0 / 0.06);
   
-  /* Background Gradients */
-  --bg-ai-light: linear-gradient(160deg, hsl(220 20% 98%) 0%, hsl(258 40% 97%) 45%, hsl(220 18% 96%) 100%);
-  --bg-ai-dark: linear-gradient(160deg, hsl(230 15% 7%) 0%, hsl(258 35% 14%) 45%, hsl(230 15% 11%) 100%);
+  /* Watercolor Wash Gradients */
+  --bg-ai-light: linear-gradient(160deg, hsl(38 22% 98%) 0%, hsl(30 30% 96%) 42%, hsl(42 18% 95%) 100%);
+  --bg-ai-dark: linear-gradient(160deg, hsl(30 18% 6%) 0%, hsl(24 22% 10%) 45%, hsl(28 16% 9%) 100%);
 
   --landing-header-height: 96px;
 
   color-scheme: light;
 }
 
-/* Dark Theme */
+/* Dark Theme (ink / evening kitchen) */
 .dark {
-  --bg: 222 47% 7%;
-  --surface-1: 217 33% 10%;
-  --surface-2: 215 28% 13%;
+  --bg: 30 16% 7%;
+  --surface-1: 30 14% 10%;
+  --surface-2: 28 14% 14%;
   
-  --text: 210 40% 96%;
-  --muted: 217 10% 65%;
+  --text: 38 28% 94%;
+  --muted: 30 10% 70%;
   
-  --border: 217 33% 17%;
+  --border: 28 12% 22%;
   
-  --accent: 142 76% 36%;
+  --accent: 28 80% 55%;
+  --accent-soft: 28 80% 55% / 0.22;
   --accent-foreground: 0 0% 100%;
+  
+  --tomato: 6 72% 60%;
+  --tomato-soft: 6 72% 60% / 0.20;
+  --leaf: 120 26% 54%;
+  --leaf-soft: 120 26% 54% / 0.18;
   
   --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.15);
   --shadow-2: 0 2px 8px 0 rgb(0 0 0 / 0.25);
@@ -81,7 +94,12 @@
   --color-muted: hsl(var(--muted));
   --color-border: hsl(var(--border));
   --color-accent: hsl(var(--accent));
+  --color-accent-soft: hsl(var(--accent-soft));
   --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-tomato: hsl(var(--tomato));
+  --color-tomato-soft: hsl(var(--tomato-soft));
+  --color-leaf: hsl(var(--leaf));
+  --color-leaf-soft: hsl(var(--leaf-soft));
 
   --font-sans: var(--font-inter);
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
@@ -95,6 +113,7 @@
 
   --shadow-soft: var(--shadow-1);
   --shadow-deep: var(--shadow-2);
+  --shadow-soft-inner: inset 0 1px 2px 0 rgb(0 0 0 / 0.05);
 
   --bg-ai-light: var(--bg-ai-light);
   --bg-ai-dark: var(--bg-ai-dark);
@@ -445,6 +464,7 @@ button, [role="button"], label, .label {
   font-weight: 480;
   font-feature-settings: "ss03";
   font-variation-settings: "opsz" 16, "slnt" 0, "GRAD" 0, "wght" 480;
+  cursor: pointer;
 }
 
 /* Input Typography */
@@ -469,6 +489,31 @@ code, pre {
   letter-spacing: 0.02em;
 }
 
+/* Handwritten Font */
+.font-caveat {
+  font-family: var(--font-caveat);
+}
+
+/* Cursive font utilities */
+.font-cursive {
+  font-family: var(--font-caveat);
+}
+
+.cursive-heading {
+  font-family: var(--font-caveat);
+  font-weight: 600;
+}
+
+.cursive-accent {
+  font-family: var(--font-caveat);
+  color: hsl(var(--accent));
+}
+
+.cursive-muted {
+  font-family: var(--font-caveat);
+  color: hsl(var(--muted));
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -479,17 +524,215 @@ code, pre {
   }
 }
 
-/* Custom Checkbox Styling for Accent Color */
+/* Custom Rounded Checkbox Styling - Market Morning Watercolor Edition */
+
+/* Base checkbox reset and custom styling */
 input[type="checkbox"] {
-  accent-color: hsl(var(--accent));
+  /* Reset native appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 99px; /* Fully rounded/pill shape */
+  
+  /* Unchecked state */
+  background-color: transparent;
+  border: 1.5px solid hsl(var(--border));
+  
+  /* Transitions */
+  transition: all 0.15s ease-out;
+  
+  /* Cursor */
+  cursor: pointer;
+  
+  /* Position for custom checkmark */
+  position: relative;
 }
 
+/* Checked state - orange background with white checkmark */
 input[type="checkbox"]:checked {
   background-color: hsl(var(--accent));
   border-color: hsl(var(--accent));
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m16.854 5.646-7.5 7.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L9 12.293l7.146-7.147a.5.5 0 0 1 .708.708z' stroke='white' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: 0 3px;
+  background-size: 25px;
 }
 
+/* Checked state for allergen checkboxes - X mark */
+input[type="checkbox"][data-checkbox-type="allergen"]:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m4.646 4.646 10.708 10.708M15.354 4.646l-10.708 10.708' stroke='white' stroke-width='2' stroke-linecap='round'/%3e%3c/svg%3e");
+  background-position: center 2px;
+  background-size: 24px;
+}
+
+/* Hover state - subtle premium effect */
+input[type="checkbox"]:hover:not(:checked):not(:disabled) {
+  background-color: hsl(var(--surface-1));
+  border-color: hsl(var(--accent) / 0.5);
+}
+
+input[type="checkbox"]:hover:checked:not(:disabled) {
+  background-color: hsl(var(--accent) / 0.9);
+  border-color: hsl(var(--accent) / 0.9);
+}
+
+/* Focus state - visible ring */
 input[type="checkbox"]:focus-visible {
-  outline: 2px solid hsl(var(--accent));
+  outline: 2px solid hsl(var(--accent) / 0.5);
   outline-offset: 2px;
+}
+
+/* Disabled state */
+input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input[type="checkbox"]:disabled:checked {
+  background-color: hsl(var(--accent) / 0.5);
+  border-color: hsl(var(--accent) / 0.5);
+}
+
+/* Dark mode adjustments */
+.dark input[type="checkbox"]:hover:not(:checked):not(:disabled) {
+  background-color: hsl(var(--surface-2));
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  input[type="checkbox"] {
+    transition: none;
+  }
+}
+
+/* Watercolor illustration blur pulse animation */
+@keyframes blur-pulse {
+  0%, 100% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+  50% {
+    filter: blur(3px);
+    opacity: 0.85;
+  }
+}
+
+/* Watercolor illustration blur to final state animation */
+@keyframes blur-to-final {
+  0% {
+    filter: blur(0px);
+    opacity: 1;
+  }
+  100% {
+    filter: blur(4px);
+    opacity: 0.2;
+  }
+}
+
+/* Landing page illustration - elegant fade-in only */
+@keyframes float-rotate-blur {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+/* Global checkbox styling */
+
+/* Mobile-optimized version - elegant fade-in only */
+@keyframes float-rotate-blur-mobile {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+/* Ingredient row highlight utilities for AI Edit */
+.ingredient-row-locked {
+  background-color: hsl(var(--accent) / 0.1);
+  border-color: hsl(var(--accent) / 0.3);
+}
+
+.dark .ingredient-row-locked {
+  background-color: hsl(var(--accent) / 0.25);
+  border-color: hsl(var(--accent) / 0.5);
+}
+
+.ingredient-row-replace {
+  background-color: hsl(211 96% 53% / 0.1);
+  border-color: hsl(211 96% 53% / 0.3);
+}
+
+.dark .ingredient-row-replace {
+  background-color: hsl(211 96% 53% / 0.35);
+  border-color: hsl(211 96% 53% / 0.8);
+}
+
+.ingredient-row-delete {
+  background-color: hsl(0 84% 60% / 0.1);
+  border-color: hsl(0 84% 60% / 0.3);
+}
+
+.dark .ingredient-row-delete {
+  background-color: hsl(0 84% 60% / 0.35);
+  border-color: hsl(0 84% 60% / 0.8);
+}
+
+.ingredient-row-default {
+  background-color: hsl(var(--surface-1) / 0.3);
+  border-color: hsl(var(--border) / 0.5);
+}
+
+.dark .ingredient-row-default {
+  background-color: hsl(var(--surface-2) / 0.3);
+  border-color: hsl(var(--border) / 0.5);
+}
+
+.ingredient-row-default:hover {
+  background-color: hsl(var(--surface-1) / 0.5);
+}
+
+.dark .ingredient-row-default:hover {
+  background-color: hsl(var(--surface-2) / 0.5);
+}
+
+/* Indicator chip utilities to match row highlights */
+.chip-locked {
+  background-color: hsl(var(--accent) / 0.15);
+  color: hsl(var(--accent));
+}
+
+.dark .chip-locked {
+  background-color: hsl(var(--accent) / 0.25);
+  color: hsl(var(--accent));
+}
+
+.chip-replace {
+  background-color: hsl(211 96% 53% / 0.1);
+  color: hsl(211 96% 53%);
+}
+
+.dark .chip-replace {
+  background-color: hsl(211 96% 53% / 0.4);
+  color: hsl(211 96% 53% / 0.8);
+}
+
+.chip-delete {
+  background-color: hsl(0 84% 60% / 0.1);
+  color: hsl(0 84% 60%);
+}
+
+.dark .chip-delete {
+  background-color: hsl(0 84% 60% / 0.4);
+  color: hsl(0 84% 60% / 0.8);
 }

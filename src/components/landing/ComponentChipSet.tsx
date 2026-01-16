@@ -7,7 +7,7 @@ import { staggerContainerVariants, staggerChipVariants, transitionPresets } from
 interface ChipData {
   id: string;
   label: string;
-  color?: "green" | "orange" | "brown" | "red" | "cream";
+  color?: "accent" | "orange" | "brown" | "red" | "cream";
 }
 
 interface ComponentChipSetProps {
@@ -16,11 +16,11 @@ interface ComponentChipSetProps {
 }
 
 const colorClasses: Record<string, string> = {
-  green: "border-green-500/50 bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20",
-  orange: "border-orange-500/50 bg-orange-500/10 text-orange-700 dark:text-orange-400 hover:bg-orange-500/20",
-  brown: "border-amber-700/50 bg-amber-700/10 text-amber-800 dark:text-amber-400 hover:bg-amber-700/20",
-  red: "border-red-500/50 bg-red-500/10 text-red-700 dark:text-red-400 hover:bg-red-500/20",
-  cream: "border-yellow-600/50 bg-yellow-600/10 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-600/20",
+  accent: "border-accent/40 bg-accent-soft text-accent dark:text-accent hover:bg-accent/25",
+  orange: "border-accent/40 bg-accent-soft text-accent dark:text-accent hover:bg-accent/25",
+  brown: "border-leaf/40 bg-leaf-soft text-leaf dark:text-leaf hover:bg-leaf/20",
+  red: "border-tomato/40 bg-tomato-soft text-tomato dark:text-tomato hover:bg-tomato/20",
+  cream: "border-accent/30 bg-accent-soft text-muted hover:bg-accent/20",
   default: "border-border/50 bg-surface-1/50 text-text hover:bg-surface-2/50",
 };
 
@@ -59,7 +59,7 @@ export function ComponentChipSet({ chips, className = "" }: ComponentChipSetProp
 
 export const DEMO_CHIPS: ChipData[] = [
   { id: "chip1", label: "Shredded Chicken", color: "orange" },
-  { id: "chip2", label: "Cilantro-Lime Rice", color: "green" },
+  { id: "chip2", label: "Cilantro-Lime Rice", color: "accent" },
   { id: "chip3", label: "Black Beans", color: "brown" },
   { id: "chip4", label: "Pickled Onions", color: "red" },
   { id: "chip5", label: "Chipotle Crema", color: "cream" },

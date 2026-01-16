@@ -158,7 +158,7 @@ export default function AIPreviewPage() {
 
   if (!recipe) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center py-16">
+      <main className="flex min-h-screen flex-col items-center justify-center pt-24 pb-16 px-4 sm:px-0">
         <div className="text-center">
           <p className="text-muted">Loading recipe...</p>
         </div>
@@ -167,7 +167,7 @@ export default function AIPreviewPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center py-16">
+    <main className="flex min-h-screen flex-col items-center pt-24 pb-16 px-4 sm:px-0">
       <div className="w-full max-w-4xl space-y-8">
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={handleGoBack}>
@@ -176,7 +176,7 @@ export default function AIPreviewPage() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-bold mb-2">✨ Generated Recipe Preview</h1>
+          <h1 className="text-3xl font-bold mb-2"><span className="font-caveat text-4xl sm:text-5xl">Generated Recipe Preview ✨</span></h1>
           <p className="text-muted">Review your AI-generated recipe before saving</p>
         </div>
 

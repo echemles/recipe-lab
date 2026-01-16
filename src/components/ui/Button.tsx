@@ -12,7 +12,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-accent text-accent-foreground hover:shadow-soft hover:-translate-y-px rounded-[--radius-button]",
+        "bg-accent-soft text-text hover:bg-accent hover:text-accent-foreground hover:shadow-soft hover:-translate-y-px rounded-[--radius-button] transition-all duration-200",
       secondary:
         "bg-surface-2 text-text border border-border hover:bg-surface-1 rounded-[--radius-button]",
       ghost: "text-muted hover:text-text hover:bg-surface-2 rounded-[--radius-button]",

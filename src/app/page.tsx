@@ -7,7 +7,7 @@ import { FlowLineDivider } from "@/components/landing/FlowLineDivider";
 
 export default function Home() {
   return (
-    <main className="landing-page flex flex-col gap-12 sm:gap-16 md:gap-24 lg:gap-24 pb-20 sm:pb-24">
+    <main className="landing-page flex flex-col gap-12 sm:gap-16 md:gap-24 lg:gap-24">
       <HeroSection />
       <FlowLineDivider />
       <InsightSection />

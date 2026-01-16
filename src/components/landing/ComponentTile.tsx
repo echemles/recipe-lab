@@ -7,7 +7,7 @@ import { componentTileVariants, transitionPresets } from "./motion";
 export interface ComponentTileData {
   id: string;
   label: string;
-  color?: "green" | "orange" | "brown" | "red" | "cream";
+  color?: "accent" | "orange" | "brown" | "red" | "cream";
 }
 
 interface ComponentTileProps {
@@ -20,7 +20,7 @@ interface ComponentTileProps {
 }
 
 const colorClasses: Record<string, string> = {
-  green: "border-green-500/40 bg-green-500/10 text-green-700 dark:text-green-400",
+  accent: "border-accent/40 bg-accent/10 text-accent dark:text-accent",
   orange: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-400",
   brown: "border-amber-700/40 bg-amber-700/10 text-amber-800 dark:text-amber-400",
   red: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-400",

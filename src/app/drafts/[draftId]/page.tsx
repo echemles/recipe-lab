@@ -3,6 +3,14 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+
+const NOT_FOUND_ILLUSTRATIONS = [
+  "grocery-bag.png",
+  "bag-with-bread.png",
+  "bag-with-beans.png",
+  "jar-with-rice.png",
+  "sack-with-pasta.png",
+];
 import {
   getDraftById,
   deleteDraft,
@@ -119,25 +127,38 @@ export default function DraftEditPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center py-16">
+      <main className="flex min-h-screen flex-col items-center py-16 px-4 sm:px-0">
         <p className="text-muted">Loading draft...</p>
       </main>
     );
   }
 
   if (!draft) {
+    const randomIllustration = NOT_FOUND_ILLUSTRATIONS[Math.floor(Math.random() * NOT_FOUND_ILLUSTRATIONS.length)];
+    
     return (
-      <main className="flex min-h-screen flex-col items-center py-16">
-        <Card className="p-8 max-w-md w-full text-center">
-          <div className="mb-6">
-            <span className="text-4xl">⚠️</span>
+      <main className="flex min-h-screen flex-col items-center justify-center py-16 px-6">
+        <div className="flex flex-col items-center gap-8 max-w-md">
+          {/* Watercolor illustration - above text with blur animation */}
+          <div className="w-[280px] h-[280px] flex items-center justify-center">
+            <img 
+              src={`/illustrations/${randomIllustration}`}
+              alt="" 
+              className="w-full h-full object-contain animate-[blur-to-final_3s_ease-out_forwards]"
+            />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Draft Not Found</h1>
-          <p className="text-muted mb-6">The draft you're looking for doesn't exist or has been deleted.</p>
-          <Link href="/recipes/ai-add">
-            <Button variant="secondary">Create New Recipe</Button>
-          </Link>
-        </Card>
+          
+          <Card className="p-8 w-full text-center">
+            <div className="mb-6">
+              <span className="text-4xl">⚠️</span>
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Draft Not Found</h1>
+            <p className="text-muted mb-6">The draft you're looking for doesn't exist or has been deleted.</p>
+            <Link href="/recipes/ai-add">
+              <Button variant="secondary">Create New Recipe</Button>
+            </Link>
+          </Card>
+        </div>
       </main>
     );
   }

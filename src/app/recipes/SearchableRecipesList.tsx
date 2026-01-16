@@ -39,6 +39,21 @@ const TAG_ICON_CONFIG = [
     label: "Low cost",
     icon: "/icons/symbol-low-cost.svg",
   },
+  {
+    tag: "spicy",
+    label: "Spicy",
+    icon: "/icons/symbol-spicy.svg",
+  },
+  {
+    tag: "vegan",
+    label: "Vegan",
+    icon: "/icons/symbol-vegan.svg",
+  },
+  {
+    tag: "low-carb",
+    label: "Low-carb",
+    icon: "/icons/symbol-low-carb.svg",
+  },
 ] as const;
 
 interface SearchableRecipesListProps {
@@ -74,7 +89,7 @@ export function SearchableRecipesList({ recipes }: SearchableRecipesListProps) {
     <section className="w-full max-w-6xl flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted">
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted z-10">
             <SearchIcon />
           </span>
           <Input
@@ -114,7 +129,10 @@ export function SearchableRecipesList({ recipes }: SearchableRecipesListProps) {
                 recipe.ingredients.length * 10;
               const baseRowSpan = 6;
               const extraRows = Math.min(Math.floor(contentLength / 100), 4);
-              const rowSpan = baseRowSpan + extraRows;
+              // Add extra rows for icons that wrap to multiple lines (3 icons per row)
+              const iconRows = matchedIcons.length > 0 ? Math.ceil(matchedIcons.length / 3) : 0;
+              const iconExtraRows = Math.max(0, iconRows - 1); // Subtract 1 since first row is already accounted for
+              const rowSpan = baseRowSpan + extraRows + iconExtraRows;
               const animationDelay = `${Math.min(index, 12) * 60}ms`;
 
               const cardStyle = {
@@ -145,6 +163,7 @@ export function SearchableRecipesList({ recipes }: SearchableRecipesListProps) {
                             utmSource="recipe-lab"
                             variant="card"
                             altFallback={recipe.title}
+                            allowClickableCredits={false}
                           />
                         </div>
                       ) : (
@@ -206,6 +225,7 @@ function SearchIcon() {
       fill="none"
       role="img"
       aria-hidden="true"
+      className="text-current"
     >
       <path
         d="M10.5 4.5a6 6 0 104.243 10.243l4.257 4.257 1.06-1.06-4.257-4.258A6 6 0 0010.5 4.5zm0 1.5a4.5 4.5 0 110 9 4.5 4.5 0 010-9z"

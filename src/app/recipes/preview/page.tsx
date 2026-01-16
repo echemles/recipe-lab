@@ -93,7 +93,7 @@ export default function RecipePreviewPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center py-16">
+      <main className="flex min-h-screen flex-col items-center justify-center pt-24 pb-16 px-4 sm:px-0">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
           <p className="text-muted">Loading recipe preview...</p>
@@ -104,7 +104,7 @@ export default function RecipePreviewPage() {
 
   if (error || !recipe) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center py-16">
+      <main className="flex min-h-screen flex-col items-center justify-center pt-24 pb-16 px-4 sm:px-0">
         <Card className="p-8 max-w-md w-full text-center">
           <div className="mb-6">
             <span className="text-4xl">⚠️</span>
@@ -121,7 +121,7 @@ export default function RecipePreviewPage() {
 
   if (savedRecipe) {
     return (
-      <main className="flex min-h-screen flex-col items-center justify-center py-16">
+      <main className="flex min-h-screen flex-col items-center justify-center pt-24 pb-16 px-4 sm:px-0">
         <Card className="p-8 max-w-md w-full text-center">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
@@ -142,12 +142,12 @@ export default function RecipePreviewPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col py-16">
-      <div className="w-full max-w-4xl mx-auto px-4 space-y-8">
+    <main className="flex min-h-screen flex-col pt-24 pb-16 px-4 sm:px-0">
+      <div className="w-full max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Recipe Preview</h1>
+            <h1 className="text-3xl font-bold"><span className="font-caveat text-4xl sm:text-5xl">Recipe Preview</span></h1>
             <p className="text-muted mt-1">Review your AI-generated recipe before saving</p>
           </div>
           <Button onClick={handleGoBack} variant="secondary">

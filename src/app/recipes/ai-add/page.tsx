@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Recipe } from "@/types/recipe";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Modal } from "@/components/ui/Modal";
+import { FoodLoadingAnimation } from "@/components/recipe/FoodLoadingAnimation";
 
 type CreatedRecipeResponse = {
   recipe: Recipe;
@@ -107,6 +108,20 @@ export default function AiAddRecipePage() {
   const [budgetFriendly, setBudgetFriendly] = useState(false);
   const [lowCarb, setLowCarb] = useState(false);
   const [glutenFree, setGlutenFree] = useState(false);
+  const [vegetarian, setVegetarian] = useState(false);
+  const [vegan, setVegan] = useState(false);
+  const [spicy, setSpicy] = useState(false);
+  const [allergensExpanded, setAllergensExpanded] = useState(false);
+  const [allergens, setAllergens] = useState({
+    dairy: false,
+    egg: false,
+    peanut: false,
+    treeNuts: false,
+    wheat: false,
+    soy: false,
+    fish: false,
+    shellfish: false,
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -190,7 +205,13 @@ export default function AiAddRecipePage() {
         budgetFriendly,
         lowCarb,
         glutenFree,
+        vegetarian,
+        vegan,
+        spicy,
       },
+      allergens: Object.entries(allergens)
+        .filter(([_, checked]) => checked)
+        .map(([name]) => name),
     };
   }
 
@@ -279,13 +300,29 @@ export default function AiAddRecipePage() {
     generateRecipeFromInputs();
   }
 
+  const handleCancelGeneration = () => {
+    // Allow cancel at any time during generation
+    handleCloseModal();
+  };
 
   return (
-    <main className="flex min-h-screen flex-col items-center py-16">
-      <div className="w-full max-w-3xl space-y-8">
+    <main className="flex min-h-screen flex-col items-center pt-24 pb-16 px-4 sm:px-0 relative overflow-hidden">
+      {/* Watercolor illustration - atmospheric background element */}
+      <div 
+        className="absolute bottom-0 right-0 w-[500px] h-[500px] pointer-events-none select-none"
+        aria-hidden="true"
+      >
+        <img 
+          src="/illustrations/bag-with-bokchoy.png" 
+          alt="" 
+          className="w-full h-full object-contain opacity-[0.16] blur-sm"
+        />
+      </div>
+      
+      <div className="w-full max-w-3xl space-y-8 relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold mb-2">AI Recipe Generator</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2"><span className="font-caveat text-4xl sm:text-5xl">AI Recipe Generator</span></h1>
             <p className="text-muted">Describe what you want, and AI will create a complete recipe</p>
           </div>
           <Link href="/recipes">
@@ -299,7 +336,7 @@ export default function AiAddRecipePage() {
           </div>
         )}
         {successMessage && (
-          <div className="rounded-[--radius-input] bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 p-4 text-green-800 dark:text-green-200">
+          <div className="rounded-[--radius-input] bg-accent/10 dark:bg-accent/20 border border-accent/30 p-4 text-accent-foreground">
             {successMessage}{" "}
             {createdRecipe && (
               <Link
@@ -313,45 +350,10 @@ export default function AiAddRecipePage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Card className="p-6 space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold mb-1 letter-spac">What would you like to make?</h2>
-              <p className="text-sm text-muted mb-4">Give the AI a starting point for your recipe</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="title">
-                Recipe Name (Optional)
-              </label>
-              <Input
-                id="title"
-                type="text"
-                placeholder="e.g. Citrus Pasta Primavera"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="description">
-                Recipe Description *
-              </label>
-              <p className="text-xs text-muted mb-1">
-                Describe the dish, flavor profile, or cooking style you want
-              </p>
-              <Textarea
-                id="description"
-                rows={4}
-                placeholder="e.g. A light pasta with fresh vegetables and citrus notes, perfect for spring..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-          </Card>
 
           <Card className="p-6 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold tracking-[0.1rem] mb-1">Ingredients You Have</h2>
+              <h2 className="text-xl font-semibold tracking-[0.1rem] mb-1">Ingredients You Have</h2>
               <p className="text-sm text-muted">Tell the AI what's in your pantry (optional)</p>
             </div>
 
@@ -364,7 +366,7 @@ export default function AiAddRecipePage() {
                   id="pantryInput"
                   type="text"
                   className="flex-1"
-                  placeholder="e.g. canned artichokes, fresh basil"
+                  placeholder="e.g. canned tuna, eggs"
                   value={pantryInput}
                   onChange={(e) => setPantryInput(e.target.value)}
                   onKeyDown={handlePantryKeyDown}
@@ -404,9 +406,45 @@ export default function AiAddRecipePage() {
             )}
           </Card>
 
+          <Card className="p-6 space-y-6">
+            <div>
+              <h2 className="text-xl font-semibold mb-1">What would you like to make?</h2>
+              <p className="text-sm text-muted mb-4">Give the AI a starting point for your recipe</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="description">
+                Recipe Description *
+              </label>
+              <p className="text-xs text-muted mb-1">
+                Describe the dish, flavor profile, or cooking style you want
+              </p>
+              <Textarea
+                id="description"
+                rows={4}
+                placeholder="e.g. A light pasta with fresh vegetables and citrus notes, perfect for spring..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1 tracking-[0.005em]" htmlFor="title">
+                Would you like to name this recipe? (Optional)
+              </label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="e.g. Citrus Pasta Primavera"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+          </Card>
+
           <Card className="p-6 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold tracking-[0.1rem] mb-1">Flavor & Preferences</h2>
+              <h2 className="text-xl font-semibold tracking-[0.1rem] mb-1">Flavor & Preferences</h2>
               <p className="text-sm text-muted">Customize the recipe to your taste</p>
             </div>
 
@@ -457,7 +495,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={highProtein}
                     onChange={(e) => setHighProtein(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">High Protein</span>
                 </label>
@@ -466,7 +504,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={quickMeal}
                     onChange={(e) => setQuickMeal(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Quick Meal (≤30 min)</span>
                 </label>
@@ -475,7 +513,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={lowCarb}
                     onChange={(e) => setLowCarb(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Low-Carb</span>
                 </label>
@@ -484,16 +522,43 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={glutenFree}
                     onChange={(e) => setGlutenFree(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Gluten-Free</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
                   <input
                     type="checkbox"
+                    checked={vegetarian}
+                    onChange={(e) => setVegetarian(e.target.checked)}
+                    className="pointer-events-none"
+                  />
+                  <span className="text-sm">Vegetarian</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={vegan}
+                    onChange={(e) => setVegan(e.target.checked)}
+                    className="pointer-events-none"
+                  />
+                  <span className="text-sm">Vegan</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={spicy}
+                    onChange={(e) => setSpicy(e.target.checked)}
+                    className="pointer-events-none"
+                  />
+                  <span className="text-sm">Spicy</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                  <input
+                    type="checkbox"
                     checked={lowCalorie}
                     onChange={(e) => setLowCalorie(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Low Calorie</span>
                 </label>
@@ -502,7 +567,7 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={mealPrepFriendly}
                     onChange={(e) => setMealPrepFriendly(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Meal-Prep Friendly</span>
                 </label>
@@ -511,11 +576,114 @@ export default function AiAddRecipePage() {
                     type="checkbox"
                     checked={lowCost}
                     onChange={(e) => setLowCost(e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-accent focus:ring-accent pointer-events-none"
+                    className="pointer-events-none"
                   />
                   <span className="text-sm">Low Cost</span>
                 </label>
               </div>
+            </div>
+
+            {/* Allergens Section */}
+            <div>
+              <button
+                type="button"
+                onClick={() => setAllergensExpanded(!allergensExpanded)}
+                className="flex items-center gap-2 text-sm font-medium mb-3 tracking-[0.005em] hover:text-accent transition-colors"
+                aria-expanded={allergensExpanded}
+              >
+                <span className="text-lg">{allergensExpanded ? '−' : '+'}</span>
+                Dietary Restrictions & Allergens (Optional)
+              </button>
+              
+              {allergensExpanded && (
+                <div className="bg-surface-1/50 rounded-lg p-4 border border-border/50">
+                  <p className="text-xs text-muted mb-3">
+                    Select any allergens to avoid. The AI will ensure ingredients are safe for your dietary needs.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.dairy}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, dairy: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Dairy</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.egg}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, egg: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Egg</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.peanut}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, peanut: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Peanut</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.treeNuts}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, treeNuts: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Tree Nuts (walnut, almond, cashew, etc.)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.wheat}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, wheat: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Wheat</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.soy}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, soy: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Soy</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.fish}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, fish: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Fish</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer hover:bg-surface-2 p-2 rounded-[--radius-input] transition-colors">
+                      <input
+                        type="checkbox"
+                        data-checkbox-type="allergen"
+                        checked={allergens.shellfish}
+                        onChange={(e) => setAllergens(prev => ({ ...prev, shellfish: e.target.checked }))}
+                        className="pointer-events-none"
+                      />
+                      <span className="text-sm">Shellfish</span>
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
           </Card>
 
@@ -612,22 +780,33 @@ export default function AiAddRecipePage() {
       </div>
 
       {/* Recipe Generation Modal */}
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} size="lg" ariaLabel="Recipe Generation">
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={handleCancelGeneration} 
+        size="lg" 
+        ariaLabel="Recipe Generation"
+        disableBackdropClose={true}
+        disableEscapeClose={false}
+      >
         {modalState === 'loading' && (
-          <div className="text-center py-6 sm:py-8">
-            <div className="mb-6">
-              <video 
-                autoPlay 
-                loop 
-                muted 
-                playsInline
-                className="w-24 h-24 mx-auto mb-4 rounded-lg dark:invert dark:hue-rotate-180"
+          <div className="text-center py-8 sm:py-12">
+            <FoodLoadingAnimation
+              size="lg"
+              message={loadingMessage || "Composing your custom recipe..."}
+              className="mx-auto"
+            />
+            <h2 className="text-xl font-semibold mt-6 mb-2 tracking-tight">
+              Generating Your Recipe
+            </h2>
+            <div className="mt-6 flex justify-center">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleCancelGeneration}
+                className="min-w-[120px]"
               >
-                <source src="/food-animation.webm" type="video/webm" />
-                Your browser does not support the video tag.
-              </video>
-              <h2 className="text-xl font-semibold mb-2">Generating Your Recipe</h2>
-              <p className="text-muted">{loadingMessage}</p>
+                Cancel
+              </Button>
             </div>
           </div>
         )}

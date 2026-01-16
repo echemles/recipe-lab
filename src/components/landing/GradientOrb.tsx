@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 
-type GradientOrbColor = "blue" | "purple" | "green";
+type GradientOrbColor = "blue" | "purple" | "orange";
 type GradientOrbSize = "sm" | "md" | "lg";
 
 interface GradientOrbProps {
@@ -15,7 +15,7 @@ interface GradientOrbProps {
 const colorMap: Record<GradientOrbColor, string> = {
   blue: "from-blue-500/30 via-cyan-500/20 to-transparent",
   purple: "from-purple-500/30 via-pink-500/20 to-transparent",
-  green: "from-green-500/30 via-emerald-500/20 to-transparent",
+  orange: "from-orange-500/30 via-amber-500/20 to-transparent",
 };
 
 const sizeMap: Record<GradientOrbSize, string> = {

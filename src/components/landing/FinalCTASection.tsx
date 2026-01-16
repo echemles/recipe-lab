@@ -4,7 +4,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { GradientOrb } from "./GradientOrb";
+import { PigmentCloud } from "./PigmentCloud";
 import { fadeInVariants, fadeInUpVariants, fadeInScaleVariants, buttonHoverVariants, transitionPresets, delayPresets } from "./motion";
 
 const CORE_COMPONENTS = [
@@ -26,27 +26,28 @@ export function FinalCTASection() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
-    <section ref={ref} className="landing-section py-20 md:py-32 px-6 relative overflow-hidden">
-      <GradientOrb
-        color="green"
+    <section ref={ref} className="landing-section py-16 md:py-32 px-4 sm:px-6 relative overflow-hidden bg-surface-2/80">
+      
+      <PigmentCloud
+        color="orange"
         size="lg"
         position={{ top: "-20%", right: "-10%" }}
         delay={0.2}
       />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        <div className="text-center mb-12 sm:mb-16">
+        <div className="text-center mb-8 sm:mb-16">
 
           <motion.h2
             variants={fadeInScaleVariants}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
             transition={{ ...transitionPresets.smooth, delay: delayPresets.short }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold mb-6 leading-tight"
+            className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-semibold mb-4 sm:mb-6"
           >
-            Cook <span className="text-accent glow-filament">smarter</span>,
+            <span className="font-caveat">Cook <span className="text-accent">smarter</span>,
             <br />
-            not harder.
+            not harder.</span>
           </motion.h2>
 
           <motion.p
@@ -54,7 +55,7 @@ export function FinalCTASection() {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
             transition={{ ...transitionPresets.smooth, delay: delayPresets.medium }}
-            className="text-lg sm:text-xl text-muted leading-relaxed max-w-2xl mx-auto"
+            className="text-sm sm:text-xl text-muted leading-relaxed max-w-2xl mx-auto px-2"
           >
             Build flexible meal components once. Mix and match them into endless meals throughout the week.
           </motion.p>
@@ -69,10 +70,11 @@ export function FinalCTASection() {
           transition={{ delay: prefersReducedMotion ? 0 : 1.8, ...transitionPresets.spring }}
           className="text-center"
         >
-          <Link href="/recipes">
-            <Button className="px-12 py-4 text-lg shadow-2xl shadow-accent/30 hover:shadow-accent/40 transition-shadow">
-              Start cooking
-            </Button>
+          <Link 
+            href="/recipes"
+            className="inline-flex items-center justify-center font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/30 focus-visible:ring-offset-2 focus-visible:ring-offset-bg tracking-[0.015em] bg-accent text-accent-foreground hover:bg-accent/90 hover:shadow-xl hover:shadow-accent/30 hover:-translate-y-0.5 active:scale-95 active:translate-y-0 rounded-[--radius-button] px-12 py-4 text-lg shadow-lg shadow-accent/25 transition-all"
+          >
+            Start cooking
           </Link>
         </motion.div>
       </div>

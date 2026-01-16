@@ -118,10 +118,10 @@ export default function AddRecipePage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center py-16">
+    <main className="flex min-h-screen flex-col items-center pt-24 pb-16 px-4 sm:px-0">
       <div className="w-full max-w-3xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Add Recipe</h1>
+          <h1 className="text-4xl font-bold mb-2"><span className="font-caveat text-5xl">Add Recipe</span></h1>
           <p className="text-muted">Share your culinary creation with the community</p>
         </div>
 
@@ -181,7 +181,7 @@ export default function AddRecipePage() {
             </div>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label
                     className="block text-sm font-medium mb-1 tracking-[0.005em]"

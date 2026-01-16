@@ -22,7 +22,7 @@ export function StepsListBuilder({
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
         <div>
-          <h3 className="text-base font-semibold tracking-[0.1rem]">Instructions</h3>
+          <h3 className="text-lg font-semibold tracking-[0.1rem]"><span className="text-lg">Instructions</span></h3>
           <p className="text-xs text-muted mt-0.5">
             Break down the recipe into clear, sequential steps
           </p>

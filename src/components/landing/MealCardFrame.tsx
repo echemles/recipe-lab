@@ -23,7 +23,7 @@ export function MealCardFrame({
   const cardState = filledCount === 0 ? "empty" : filledCount >= slots ? "complete" : "partial";
 
   const colorClasses: Record<string, string> = {
-    green: "border-green-500/60 bg-green-500/20 text-green-700 dark:text-green-400",
+    accent: "border-accent/60 bg-accent/20 text-accent dark:text-accent",
     orange: "border-orange-500/60 bg-orange-500/20 text-orange-700 dark:text-orange-400",
     brown: "border-amber-700/60 bg-amber-700/20 text-amber-800 dark:text-amber-400",
     red: "border-red-500/60 bg-red-500/20 text-red-700 dark:text-red-400",
@@ -46,7 +46,7 @@ export function MealCardFrame({
       aria-label={`${name} meal card with ${filledCount} of ${slots} components`}
       aria-live="polite"
     >
-      <h4 className="text-lg font-semibold mb-4 text-center">{name}</h4>
+      <h4 className="text-lg font-semibold mb-4 text-center"><span className="font-caveat text-xl">{name}</span></h4>
 
       <div className="flex flex-col gap-2">
         {Array.from({ length: slots }).map((_, index) => {
@@ -80,7 +80,7 @@ export function MealCardFrame({
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: prefersReducedMotion ? 0 : 0.4, delay: 0.2 }}
-          className="absolute -top-2 -right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+          className="absolute -top-2 -right-2 w-8 h-8 bg-accent rounded-full flex items-center justify-center"
         >
           <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

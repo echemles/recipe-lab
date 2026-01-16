@@ -23,6 +23,9 @@ export type AIRecipeDraftInput = {
     budgetFriendly?: boolean;
     lowCarb?: boolean;
     glutenFree?: boolean;
+    vegetarian?: boolean;
+    vegan?: boolean;
+    spicy?: boolean;
   };
 };
 
@@ -79,7 +82,7 @@ export async function generateRecipeDraft({
     throw new Error("Failed to parse recipe JSON from model.");
   }
 
-  return normalizeRecipe(parsed);
+  return normalizeRecipe(parsed, preferences);
 }
 
 function buildSystemPrompt(): string {
@@ -149,6 +152,9 @@ function buildUserPrompt(
   if (preferences.budgetFriendly) dietaryNeeds.push("budget-friendly");
   if (preferences.lowCarb) dietaryNeeds.push("low-carb");
   if (preferences.glutenFree) dietaryNeeds.push("gluten-free");
+  if (preferences.vegetarian) dietaryNeeds.push("vegetarian");
+  if (preferences.vegan) dietaryNeeds.push("vegan");
+  if (preferences.spicy) dietaryNeeds.push("spicy");
 
   if (dietaryNeeds.length) {
     parts.push(`Dietary requirements: ${dietaryNeeds.join(", ")}`);
@@ -157,7 +163,27 @@ function buildUserPrompt(
   return parts.join("\n");
 }
 
-function normalizeRecipe(parsed: RecipeInput): RecipeInput {
+function normalizeRecipe(parsed: RecipeInput, preferences: AIRecipeDraftInput["preferences"] = {}): RecipeInput {
+  // Start with existing tags from AI
+  const tags = new Set(
+    Array.isArray(parsed.tags)
+      ? parsed.tags.map((tag) => tag.trim()).filter(Boolean)
+      : []
+  );
+
+  // Add tags based on preferences
+  if (preferences.highProtein) tags.add("high protein");
+  if (preferences.quickMeal) tags.add("quick meal (30 minutes or less)");
+  if (preferences.lowCalorie) tags.add("low-calorie");
+  if (preferences.mealPrepFriendly) tags.add("meal-prep friendly");
+  if (preferences.lowCost) tags.add("low cost");
+  if (preferences.budgetFriendly) tags.add("budget-friendly");
+  if (preferences.lowCarb) tags.add("low-carb");
+  if (preferences.glutenFree) tags.add("gluten-free");
+  if (preferences.vegetarian) tags.add("vegetarian");
+  if (preferences.vegan) tags.add("vegan");
+  if (preferences.spicy) tags.add("spicy");
+
   return {
     title: parsed.title?.trim() || "Chef's Choice",
     description: parsed.description?.trim() || "A delicious dish.",
@@ -174,8 +200,6 @@ function normalizeRecipe(parsed: RecipeInput): RecipeInput {
     prepTimeMinutes: parsed.prepTimeMinutes ?? undefined,
     cookTimeMinutes: parsed.cookTimeMinutes ?? undefined,
     servings: parsed.servings ?? undefined,
-    tags: Array.isArray(parsed.tags)
-      ? parsed.tags.map((tag) => tag.trim()).filter(Boolean)
-      : undefined,
+    tags: Array.from(tags),
   };
 }
