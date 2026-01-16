@@ -223,15 +223,22 @@ export default function RecipeDetailClient({ recipe }: RecipeDetailClientProps) 
               ← Back to recipes
             </Button>
           </Link>
-          <div className="flex gap-2">
-            <Link href={`/recipe/${recipe.id}/ai-edit`}>
-              <Button variant="secondary" size="sm">
-                AI Edit
-              </Button>
-            </Link>
-            <Link href={`/recipe/${recipe.id}/edit`} data-testid="edit-recipe-link">
-              <Button variant="secondary" size="sm">
-                Edit recipe
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex gap-2">
+              <Link href={`/recipe/${recipe.id}/ai-edit`}>
+                <Button variant="secondary" size="sm">
+                  <span aria-hidden="true" className="mr-1">🤖</span>AI Edit
+                </Button>
+              </Link>
+              <Link href={`/recipe/${recipe.id}/edit`} data-testid="edit-recipe-link">
+                <Button variant="secondary" size="sm">
+                  <span aria-hidden="true" className="mr-1">✏️</span>Edit recipe
+                </Button>
+              </Link>
+            </div>
+            <Link href={`/grocery/add?recipeId=${recipe.id}`}>
+              <Button variant="secondary" size="sm" className="w-full sm:w-auto">
+                <span aria-hidden="true" className="mr-1">🛒</span>Add items to grocery list
               </Button>
             </Link>
           </div>

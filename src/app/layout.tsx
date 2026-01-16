@@ -68,6 +68,9 @@ export default function RootLayout({
                 <Link href="/recipes" className="hover:text-text transition-colors">
                   All recipes
                 </Link>
+                <Link href="/grocery" className="hover:text-text transition-colors">
+                  Grocery list
+                </Link>
                 <ThemeToggle />
               </nav>
             </div>
